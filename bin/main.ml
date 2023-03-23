@@ -1,21 +1,21 @@
 type drawable = Column of drawable list | Rectangle of int * int
 
-let placeholder = Column [ Rectangle (200, 200); Rectangle (200, 200) ]
+let placeholder = Column [ Rectangle (20, 200); Rectangle (100, 400) ]
 
-let rec calc available_height available_width = function
+let rec calc parent_w parent_h = function
   | Rectangle (w, h) ->
-      let w = if w < available_width then w else available_width in
-      let h = if h < available_height then h else available_height in
+      let w = if w < parent_w then w else parent_w in
+      let h = if h < parent_h then h else parent_h in
       (w, h)
   | Column lst ->
       let length = List.length lst in
-      let max_w = available_width / length in
-      let max_h = available_height / length in
+      let max_w = parent_w / length in
+      let max_h = parent_h / length in
       let _ =
         List.fold_left
           (fun y_pos el ->
             let w, h = calc max_h max_w el in
-            Raylib.draw_rectangle 0 y_pos h w Raylib.Color.black;
+            Raylib.draw_rectangle 0 y_pos w h Raylib.Color.black;
             y_pos + h)
           0 lst
       in
