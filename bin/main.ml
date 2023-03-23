@@ -1,42 +1,61 @@
-type drawable = Column of drawable list * Raylib.Color.t | Rectangle of int * int * Raylib.Color.t | Row of drawable list * Raylib.Color.t
+type drawable =
+  | Column of drawable list
+  | Row of drawable list
+  | Rectangle of int * int * Raylib.Color.t
+  | Padding of int * int * drawable
 
-let placeholder = 
-  Row ([
-    Column ([ Rectangle (20, 200, Raylib.Color.red); Rectangle (100, 400, Raylib.Color.beige) ], Raylib.Color.brown);
-    Column ([ Rectangle (50, 300, Raylib.Color.darkgreen); Rectangle (200, 200, Raylib.Color.orange) ], Raylib.Color.darkbrown);
-  ], Raylib.Color.gold)
+let placeholder =
+  Row
+    [
+      Column
+        [
+          Rectangle (20, 200, Raylib.Color.red);
+          Rectangle (100, 400, Raylib.Color.beige);
+        ];
+      Column
+        [
+          Rectangle (50, 300, Raylib.Color.darkgreen);
+          Rectangle (200, 200, Raylib.Color.orange);
+        ];
+    ]
 
-let rec calc parent_w parent_h = function
+let rec calc parent_x parent_y parent_w parent_h = function
   | Rectangle (w, h, c) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
-      (w, h, c)
-  | Column(lst, c) ->
-      let length = List.length lst in
-      let max_w = parent_w / length in
-      let max_h = parent_h / length in
-      let _ =
+      Raylib.draw_rectangle parent_x parent_y w h c;
+      (w, h)
+  | Column lst ->
+      let _, w, h =
         List.fold_left
-          (fun y_pos el ->
-            let w, h, c = calc max_h max_w el in
-            Raylib.draw_rectangle 0 y_pos w h c;
-            y_pos + h)
-          0 lst
+          (fun (y_pos, max_child_w, acc_h) el ->
+            let max_w = parent_w in
+            let max_h = parent_h - acc_h in
+            let w, h = calc parent_x y_pos max_w max_h el in
+            let max_child_w = if w > max_child_w then w else max_child_w in
+            (y_pos + h, max_child_w, acc_h + h))
+          (parent_y, 0, 0) lst
       in
-      (max_w, max_h, c)
-  | Row(lst, c) ->
-      let length = List.length lst in
-      let max_w = parent_w / length in
-      let max_h = parent_h / length in
-      let _ =
+      (w, h)
+  | Row lst ->
+      let _, w, h =
         List.fold_left
-          (fun x_pos el ->
-            let w, h, c = calc max_h max_w el in
-            Raylib.draw_rectangle x_pos 0 w h c;
-            x_pos + w)
-          0 lst
+          (fun (x_pos, acc_w, max_child_h) el ->
+            let max_w = parent_w - acc_w in
+            let max_h = parent_h in
+            let w, h = calc x_pos parent_y max_w max_h el in
+            let max_child_h = if h > max_child_h then h else max_child_h in
+            (x_pos + w, acc_w + w, max_child_h))
+          (parent_x, 0, 0) lst
       in
-      max_w, max_h, c
+      (w, h)
+  | Padding (w, h, d) ->
+      let x_offset = parent_x + (w / 2) in
+      let y_offset = parent_y + (h / 2) in
+      let max_width = parent_w - (w * 2) in
+      let max_height = parent_h - (h * 2) in
+      let _ = calc x_offset y_offset max_width max_height d in
+      (w, h)
 
 let setup () =
   let width = Raylib.get_monitor_width 0 in
@@ -53,7 +72,7 @@ let rec loop () =
       let width = Raylib.get_screen_width () in
       let open Raylib in
       begin_drawing ();
-      let _ = calc height width placeholder in
+      let _ = calc 0 0 width height placeholder in
       clear_background Color.raywhite;
       draw_text "Congrats! You created your first window!" 190 200 20
         Color.lightgray;
