@@ -1,4 +1,4 @@
 (executable
  (public_name reyml)
  (name main)
- (libraries reyml))
+ (libraries raylib reyml))
