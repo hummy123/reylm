@@ -1,7 +1,8 @@
 type drawable =
   | Column of drawable list
   | Row of drawable list
-  | Rectangle of int * int * Raylib.Color.t
+  | Rect of int * int * Raylib.Color.t
+  | RoundRect of int * int * float * Raylib.Color.t
   | Padding of int * int * drawable
 
 let placeholder =
@@ -9,21 +10,30 @@ let placeholder =
     [
       Column
         [
-          Rectangle (20, 200, Raylib.Color.red);
-          Padding (30, 30, Rectangle (100, 400, Raylib.Color.beige));
+          Rect (20, 200, Raylib.Color.red);
+          Padding (30, 30, Rect (100, 400, Raylib.Color.beige));
         ];
       Column
         [
-          Rectangle (50, 300, Raylib.Color.darkgreen);
-          Rectangle (200, 200, Raylib.Color.orange);
+          Rect (50, 300, Raylib.Color.darkgreen);
+          RoundRect (200, 200, 0.2, Raylib.Color.orange);
         ];
     ]
 
 let rec calc parent_x parent_y parent_w parent_h = function
-  | Rectangle (w, h, c) ->
+  | Rect (w, h, c) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
-      Raylib.draw_rectangle_lines parent_x parent_y w h c;
+      Raylib.draw_rectangle parent_x parent_y w h c;
+      (w, h)
+  | RoundRect (w, h, r, c) ->
+      let w = if w < parent_w then w else parent_w in
+      let h = if h < parent_h then h else parent_h in
+      let rect =
+        Raylib.Rectangle.create (float_of_int parent_x) (float_of_int parent_y)
+          (float_of_int w) (float_of_int h)
+      in
+      Raylib.draw_rectangle_rounded rect r 10 c;
       (w, h)
   | Column lst ->
       let _, w, h =
