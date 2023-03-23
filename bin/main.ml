@@ -23,7 +23,7 @@ let rec calc parent_x parent_y parent_w parent_h = function
   | Rectangle (w, h, c) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
-      Raylib.draw_rectangle parent_x parent_y w h c;
+      Raylib.draw_rectangle_lines parent_x parent_y w h c;
       (w, h)
   | Column lst ->
       let _, w, h =
