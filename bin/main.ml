@@ -10,7 +10,7 @@ let placeholder =
       Column
         [
           Rectangle (20, 200, Raylib.Color.red);
-          Rectangle (100, 400, Raylib.Color.beige);
+          Padding (30, 30, Rectangle (100, 400, Raylib.Color.beige));
         ];
       Column
         [
@@ -54,8 +54,8 @@ let rec calc parent_x parent_y parent_w parent_h = function
       let y_offset = parent_y + (h / 2) in
       let max_width = parent_w - (w * 2) in
       let max_height = parent_h - (h * 2) in
-      let _ = calc x_offset y_offset max_width max_height d in
-      (w, h)
+      let c_w, c_h = calc x_offset y_offset max_width max_height d in
+      (c_w + w, c_h + h)
 
 let setup () =
   let width = Raylib.get_monitor_width 0 in
