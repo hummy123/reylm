@@ -4,15 +4,18 @@ type drawable =
   | Rect of int * int * Raylib.Color.t
   | RoundRect of int * int * float * Raylib.Color.t
   | Padding of int * int * drawable
+  | Box of Raylib.Color.t * drawable
 
 let placeholder =
   Row
     [
-      Column
-        [
-          Rect (20, 200, Raylib.Color.red);
-          Padding (30, 30, Rect (100, 400, Raylib.Color.beige));
-        ];
+      Box
+        ( Raylib.Color.black,
+          Column
+            [
+              Rect (20, 200, Raylib.Color.red);
+              Padding (30, 30, Rect (100, 400, Raylib.Color.beige));
+            ] );
       Column
         [
           Rect (50, 300, Raylib.Color.darkgreen);
@@ -25,6 +28,11 @@ let rec calc parent_x parent_y parent_w parent_h = function
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       Raylib.draw_rectangle parent_x parent_y w h c;
+      (w, h)
+  | Box (c, d) ->
+      let w, h = calc parent_x parent_y parent_w parent_h d in
+      Raylib.draw_rectangle parent_x parent_y w h c;
+      let _ = calc parent_x parent_y parent_w parent_h d in
       (w, h)
   | RoundRect (w, h, r, c) ->
       let w = if w < parent_w then w else parent_w in
