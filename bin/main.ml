@@ -5,6 +5,7 @@ type drawable =
   | RoundRect of int * int * float * Raylib.Color.t * drawable
   | Padding of int * int * drawable
   | Box of Raylib.Color.t * drawable
+  | Border of Raylib.Color.t * drawable
   | Empty
 
 let placeholder =
@@ -20,12 +21,16 @@ let placeholder =
       Column
         [
           Rect (50, 300, Raylib.Color.darkgreen, Empty);
-          RoundRect (200, 200, 0.2, Raylib.Color.orange, Empty);
+          Border(Raylib.Color.pink, RoundRect (200, 200, 0.2, Raylib.Color.orange, Empty));
         ];
     ]
 
 let rec calc parent_x parent_y parent_w parent_h = function
   | Empty -> (0, 0)
+  | Border(c, d) ->
+      let w, h = calc parent_x parent_y parent_w parent_h d in
+      Raylib.draw_rectangle_lines parent_x parent_y w h c;
+      w, h
   | Rect (w, h, c, d) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
