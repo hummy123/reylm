@@ -1,12 +1,19 @@
+type width = int
+type height = int
+type radius = float
+type left = int
+type top = int
+type right = int
+type bottom = int
+type thickness = float
+
 type drawable =
   | Column of drawable list
   | Row of drawable list
-  | Rect of int * int * Raylib.Color.t * drawable
-  | RoundRect of int * int * float * Raylib.Color.t * drawable
-  | Padding of int * int * int * int * drawable
+  | Rect of width * height * radius * Raylib.Color.t * drawable
+  | Padding of left * top * right * bottom * drawable
   | Box of Raylib.Color.t * drawable
-  | RectBorder of Raylib.Color.t * drawable
-  | RoundBorder of float * Raylib.Color.t * float * drawable
+  | Border of radius * Raylib.Color.t * thickness * drawable
   | Empty
 
 let placeholder =
@@ -16,20 +23,22 @@ let placeholder =
         ( Raylib.Color.black,
           Column
             [
-              Rect (20, 200, Raylib.Color.red, Empty);
+              Rect (20, 200, 0.0, Raylib.Color.red, Empty);
               Padding
-                (10, 20, 30, 40, Rect (100, 400, Raylib.Color.beige, Empty));
+                (10, 20, 30, 40, Rect (100, 400, 0.2, Raylib.Color.beige, Empty));
             ] );
       Column
         [
-          RoundBorder
+          Border
             ( 10.0,
               Raylib.Color.raywhite,
               4.0,
-              Rect (50, 300, Raylib.Color.darkgreen, Empty) );
-          RectBorder
-            ( Raylib.Color.pink,
-              RoundRect (200, 200, 0.2, Raylib.Color.orange, Empty) );
+              Rect (50, 300, 0.4, Raylib.Color.darkgreen, Empty) );
+          Border
+            ( 0.2,
+              Raylib.Color.pink,
+              1.0,
+              Rect (200, 200, 0.2, Raylib.Color.orange, Empty) );
         ];
     ]
 
@@ -40,11 +49,7 @@ let rec calc parent_x parent_y parent_w parent_h = function
       Raylib.draw_rectangle parent_x parent_y w h c;
       let _ = calc parent_x parent_y parent_w parent_h d in
       (w, h)
-  | RectBorder (c, d) ->
-      let w, h = calc parent_x parent_y parent_w parent_h d in
-      Raylib.draw_rectangle_lines parent_x parent_y w h c;
-      (w, h)
-  | RoundBorder (r, c, t, d) ->
+  | Border (r, c, t, d) ->
       let w, h = calc parent_x parent_y parent_w parent_h d in
       let rect =
         Raylib.Rectangle.create (float_of_int parent_x) (float_of_int parent_y)
@@ -52,20 +57,14 @@ let rec calc parent_x parent_y parent_w parent_h = function
       in
       Raylib.draw_rectangle_rounded_lines rect r 10 t c;
       (w, h)
-  | Rect (w, h, c, d) ->
-      let w = if w < parent_w then w else parent_w in
-      let h = if h < parent_h then h else parent_h in
-      Raylib.draw_rectangle parent_x parent_y w h c;
-      let _ = calc parent_x parent_y w h d in
-      (w, h)
-  | RoundRect (w, h, r, c, d) ->
+  | Rect (w, h, r, c, d) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       let rect =
         Raylib.Rectangle.create (float_of_int parent_x) (float_of_int parent_y)
           (float_of_int w) (float_of_int h)
       in
-      Raylib.draw_rectangle_rounded rect r 10 c;
+      Raylib.draw_rectangle_rounded rect r 0 c;
       let _ = calc parent_x parent_y w h d in
       (w, h)
   | Column lst ->
