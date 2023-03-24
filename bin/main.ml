@@ -11,10 +11,10 @@ type label = string
 type drawable =
   | Column of drawable list
   | Row of drawable list
-  | Rect of label * width * height * radius * Raylib.Color.t * drawable
+  | Button of label * width * height * radius * Raylib.Color.t * drawable
   | Padding of left * top * right * bottom * drawable
   | Box of Raylib.Color.t * drawable
-  | Border of label * radius * Raylib.Color.t * thickness * drawable
+  | Border of radius * Raylib.Color.t * thickness * drawable
   | Empty
 
 let placeholder =
@@ -24,28 +24,26 @@ let placeholder =
         ( Raylib.Color.black,
           Column
             [
-              Rect ("", 20, 200, 0.0, Raylib.Color.red, Empty);
+              Button ("", 20, 200, 0.0, Raylib.Color.red, Empty);
               Padding
                 ( 10,
                   20,
                   30,
                   40,
-                  Rect ("", 100, 400, 0.2, Raylib.Color.beige, Empty) );
+                  Button ("", 100, 400, 0.2, Raylib.Color.beige, Empty) );
             ] );
       Column
         [
           Border
-            ( "",
-              10.0,
+            ( 10.0,
               Raylib.Color.raywhite,
               4.0,
-              Rect ("", 50, 300, 0.4, Raylib.Color.darkgreen, Empty) );
+              Button ("", 50, 300, 0.4, Raylib.Color.darkgreen, Empty) );
           Border
-            ( "",
-              0.2,
+            ( 0.2,
               Raylib.Color.pink,
               1.0,
-              Rect ("", 200, 200, 0.2, Raylib.Color.orange, Empty) );
+              Button ("", 200, 200, 0.2, Raylib.Color.orange, Empty) );
         ];
     ]
 
@@ -56,7 +54,7 @@ let rec calc parent_x parent_y parent_w parent_h = function
       Raylib.draw_rectangle parent_x parent_y w h c;
       let _ = calc parent_x parent_y parent_w parent_h d in
       (w, h)
-  | Border (_, r, c, t, d) ->
+  | Border (r, c, t, d) ->
       let w, h = calc parent_x parent_y parent_w parent_h d in
       let rect =
         Raylib.Rectangle.create (float_of_int parent_x) (float_of_int parent_y)
@@ -64,7 +62,7 @@ let rec calc parent_x parent_y parent_w parent_h = function
       in
       Raylib.draw_rectangle_rounded_lines rect r 10 t c;
       (w, h)
-  | Rect (_, w, h, r, c, d) ->
+  | Button (_, w, h, r, c, d) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       let rect =
