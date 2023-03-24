@@ -1,10 +1,11 @@
 type drawable =
   | Column of drawable list
   | Row of drawable list
-  | Rect of int * int * Raylib.Color.t
-  | RoundRect of int * int * float * Raylib.Color.t
+  | Rect of int * int * Raylib.Color.t * drawable
+  | RoundRect of int * int * float * Raylib.Color.t * drawable
   | Padding of int * int * drawable
   | Box of Raylib.Color.t * drawable
+  | Empty
 
 let placeholder =
   Row
@@ -13,28 +14,30 @@ let placeholder =
         ( Raylib.Color.black,
           Column
             [
-              Rect (20, 200, Raylib.Color.red);
-              Padding (30, 30, Rect (100, 400, Raylib.Color.beige));
+              Rect (20, 200, Raylib.Color.red, Empty);
+              Padding (30, 30, Rect (100, 400, Raylib.Color.beige, Empty));
             ] );
       Column
         [
-          Rect (50, 300, Raylib.Color.darkgreen);
-          RoundRect (200, 200, 0.2, Raylib.Color.orange);
+          Rect (50, 300, Raylib.Color.darkgreen, Empty);
+          RoundRect (200, 200, 0.2, Raylib.Color.orange, Empty);
         ];
     ]
 
 let rec calc parent_x parent_y parent_w parent_h = function
-  | Rect (w, h, c) ->
+  | Empty -> (0, 0)
+  | Rect (w, h, c, d) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       Raylib.draw_rectangle parent_x parent_y w h c;
+      let _ = calc parent_x parent_y w h d in
       (w, h)
   | Box (c, d) ->
       let w, h = calc parent_x parent_y parent_w parent_h d in
       Raylib.draw_rectangle parent_x parent_y w h c;
       let _ = calc parent_x parent_y parent_w parent_h d in
       (w, h)
-  | RoundRect (w, h, r, c) ->
+  | RoundRect (w, h, r, c, d) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       let rect =
@@ -42,6 +45,7 @@ let rec calc parent_x parent_y parent_w parent_h = function
           (float_of_int w) (float_of_int h)
       in
       Raylib.draw_rectangle_rounded rect r 10 c;
+      let _ = calc parent_x parent_y w h d in
       (w, h)
   | Column lst ->
       let _, w, h =
