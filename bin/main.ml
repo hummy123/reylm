@@ -3,7 +3,7 @@ type drawable =
   | Row of drawable list
   | Rect of int * int * Raylib.Color.t * drawable
   | RoundRect of int * int * float * Raylib.Color.t * drawable
-  | Padding of int * int * drawable
+  | Padding of int * int * int * int * drawable
   | Box of Raylib.Color.t * drawable
   | Border of Raylib.Color.t * drawable
   | Empty
@@ -16,21 +16,24 @@ let placeholder =
           Column
             [
               Rect (20, 200, Raylib.Color.red, Empty);
-              Padding (30, 30, Rect (100, 400, Raylib.Color.beige, Empty));
+              Padding
+                (10, 20, 30, 40, Rect (100, 400, Raylib.Color.beige, Empty));
             ] );
       Column
         [
           Rect (50, 300, Raylib.Color.darkgreen, Empty);
-          Border(Raylib.Color.pink, RoundRect (200, 200, 0.2, Raylib.Color.orange, Empty));
+          Border
+            ( Raylib.Color.pink,
+              RoundRect (200, 200, 0.2, Raylib.Color.orange, Empty) );
         ];
     ]
 
 let rec calc parent_x parent_y parent_w parent_h = function
   | Empty -> (0, 0)
-  | Border(c, d) ->
+  | Border (c, d) ->
       let w, h = calc parent_x parent_y parent_w parent_h d in
       Raylib.draw_rectangle_lines parent_x parent_y w h c;
-      w, h
+      (w, h)
   | Rect (w, h, c, d) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
@@ -76,13 +79,13 @@ let rec calc parent_x parent_y parent_w parent_h = function
           (parent_x, 0, 0) lst
       in
       (w, h)
-  | Padding (w, h, d) ->
-      let x_offset = parent_x + (w / 2) in
-      let y_offset = parent_y + (h / 2) in
-      let max_width = parent_w - (w * 2) in
-      let max_height = parent_h - (h * 2) in
-      let c_w, c_h = calc x_offset y_offset max_width max_height d in
-      (c_w + w, c_h + h)
+  | Padding (l, t, r, b, d) ->
+      let x_start = parent_x + l in
+      let y_start = parent_y + t in
+      let max_width = parent_w - (l + r) in
+      let max_height = parent_h - (t + b) in
+      let c_w, c_h = calc x_start y_start max_width max_height d in
+      (c_w + l + r, c_h + t + b)
 
 let setup () =
   let width = Raylib.get_monitor_width 0 in
