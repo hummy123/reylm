@@ -5,7 +5,8 @@ type drawable =
   | RoundRect of int * int * float * Raylib.Color.t * drawable
   | Padding of int * int * int * int * drawable
   | Box of Raylib.Color.t * drawable
-  | Border of Raylib.Color.t * drawable
+  | RectBorder of Raylib.Color.t * drawable
+  | RoundBorder of float * Raylib.Color.t * float * drawable
   | Empty
 
 let placeholder =
@@ -21,8 +22,12 @@ let placeholder =
             ] );
       Column
         [
-          Rect (50, 300, Raylib.Color.darkgreen, Empty);
-          Border
+          RoundBorder
+            ( 10.0,
+              Raylib.Color.raywhite,
+              4.0,
+              Rect (50, 300, Raylib.Color.darkgreen, Empty) );
+          RectBorder
             ( Raylib.Color.pink,
               RoundRect (200, 200, 0.2, Raylib.Color.orange, Empty) );
         ];
@@ -30,20 +35,28 @@ let placeholder =
 
 let rec calc parent_x parent_y parent_w parent_h = function
   | Empty -> (0, 0)
-  | Border (c, d) ->
+  | Box (c, d) ->
+      let w, h = calc parent_x parent_y parent_w parent_h d in
+      Raylib.draw_rectangle parent_x parent_y w h c;
+      let _ = calc parent_x parent_y parent_w parent_h d in
+      (w, h)
+  | RectBorder (c, d) ->
       let w, h = calc parent_x parent_y parent_w parent_h d in
       Raylib.draw_rectangle_lines parent_x parent_y w h c;
+      (w, h)
+  | RoundBorder (r, c, t, d) ->
+      let w, h = calc parent_x parent_y parent_w parent_h d in
+      let rect =
+        Raylib.Rectangle.create (float_of_int parent_x) (float_of_int parent_y)
+          (float_of_int w) (float_of_int h)
+      in
+      Raylib.draw_rectangle_rounded_lines rect r 10 t c;
       (w, h)
   | Rect (w, h, c, d) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       Raylib.draw_rectangle parent_x parent_y w h c;
       let _ = calc parent_x parent_y w h d in
-      (w, h)
-  | Box (c, d) ->
-      let w, h = calc parent_x parent_y parent_w parent_h d in
-      Raylib.draw_rectangle parent_x parent_y w h c;
-      let _ = calc parent_x parent_y parent_w parent_h d in
       (w, h)
   | RoundRect (w, h, r, c, d) ->
       let w = if w < parent_w then w else parent_w in
