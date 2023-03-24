@@ -1,4 +1,4 @@
-type state = ButtonState
+type state = ButtonState of Button.state
 type label = string
 type state_tree = SE | ST of int * state_tree * label * state * state_tree
 
