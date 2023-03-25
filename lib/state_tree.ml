@@ -1,4 +1,4 @@
-type state = ButtonState of Button.state
+type state = ButtonState of Button_types.state
 type label = string
 type state_tree = SE | ST of int * state_tree * label * state * state_tree
 
@@ -54,3 +54,10 @@ let rec find_opt key = function
       if key < k then find_opt key l
       else if key > k then find_opt key r
       else Some v
+
+let rec draw_labels = function
+  | SE -> ()
+  | ST (_, l, sl, _, r) ->
+      draw_labels l;
+      Raylib.draw_text sl 20 20 20 Raylib.Color.black;
+      draw_labels r
