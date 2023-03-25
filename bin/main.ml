@@ -7,13 +7,27 @@ let placeholder =
         ( Raylib.Color.black,
           Column
             [
-              Button ("", 20, 200, 0.0, Raylib.Color.red, Empty);
+              Button
+                ( "first",
+                  20,
+                  200,
+                  0.0,
+                  Raylib.Color.green,
+                  Raylib.Color.red,
+                  Empty );
               Padding
                 ( 10,
                   20,
                   30,
                   40,
-                  Button ("", 100, 400, 0.2, Raylib.Color.beige, Empty) );
+                  Button
+                    ( "second",
+                      100,
+                      400,
+                      0.2,
+                      Raylib.Color.beige,
+                      Raylib.Color.orange,
+                      Empty ) );
             ] );
       Column
         [
@@ -21,12 +35,26 @@ let placeholder =
             ( 10.0,
               Raylib.Color.raywhite,
               4.0,
-              Button ("", 50, 300, 0.4, Raylib.Color.darkgreen, Empty) );
+              Button
+                ( "third",
+                  50,
+                  300,
+                  0.4,
+                  Raylib.Color.darkgreen,
+                  Raylib.Color.yellow,
+                  Empty ) );
           Border
             ( 0.2,
               Raylib.Color.pink,
               1.0,
-              Button ("", 200, 200, 0.2, Raylib.Color.orange, Empty) );
+              Button
+                ( "fourth",
+                  200,
+                  200,
+                  0.2,
+                  Raylib.Color.orange,
+                  Raylib.Color.black,
+                  Empty ) );
         ];
     ]
 
@@ -41,12 +69,10 @@ let rec loop () =
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false ->
-      let height = Raylib.get_screen_height () in
-      let width = Raylib.get_screen_width () in
       let open Raylib in
       begin_drawing ();
-      let _ = Reyml.draw 0 0 width height placeholder in
       clear_background Color.raywhite;
+      let _ = Reyml.draw placeholder Reyml.empty_state in
       draw_text "Congrats! You created your first window!" 190 200 20
         Color.lightgray;
       end_drawing ();
