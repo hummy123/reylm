@@ -71,11 +71,12 @@ let draw view (state_tree : State_tree.state_tree) =
           | Some (ButtonState x) -> x
           | None -> Button.initial_button_state
         in
-        let c = if button_state.hovering then c_hover else c_unselected in
+        let c =
+          if button_state.action = Hovering then
+            Button.get_hover_col c_unselected c_hover button_state
+          else c_unselected
+        in
         Raylib.draw_rectangle_rounded rect r 0 c;
-        Raylib.draw_text
-          (string_of_bool button_state.hovering)
-          parent_x parent_y 80 Raylib.Color.black;
         let _, _, state_tree = draw_rec parent_x parent_y w h state_tree d in
         (w, h, state_tree)
     | Column lst ->
