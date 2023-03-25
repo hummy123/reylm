@@ -7,6 +7,9 @@ type right = int
 type bottom = int
 type thickness = float
 type label = string
+type unselected_col = Raylib.Color.t
+type hover_col = Raylib.Color.t
+type click_col = Raylib.Color.t
 
 type drawable =
   | Column of drawable list
@@ -16,8 +19,9 @@ type drawable =
       * width
       * height
       * radius
-      * Raylib.Color.t
-      * Raylib.Color.t
+      * unselected_col
+      * hover_col
+      * click_col
       * drawable
   | Padding of left * top * right * bottom * drawable
   | Box of Raylib.Color.t * drawable
@@ -47,7 +51,7 @@ let draw view (state : State_tree.state_tree) =
         in
         Raylib.draw_rectangle_rounded_lines rect r 10 t c;
         (w, h)
-    | Button (key, w, h, r, c_unselected, c_hover, d) ->
+    | Button (key, w, h, r, c_unselected, c_hover, c_click, d) ->
         let w = if w < parent_w then w else parent_w in
         let h = if h < parent_h then h else parent_h in
         let rect =
@@ -64,17 +68,20 @@ let draw view (state : State_tree.state_tree) =
           | Some (ButtonState x) -> x
           | None -> Button_types.initial_button_state
         in
-        let _ =
+        let button_state =
           if is_hovering && did_click then
-            state := Button.reduce key !state Button_types.ClickHeld
+            Button.reduce button_state Button_types.ClickHeld
           else if is_hovering then
-            state := Button.reduce key !state Button_types.Hovering
-          else state := Button.reduce key !state Button_types.Inactive
+            Button.reduce button_state Button_types.Hovering
+          else Button.reduce button_state Button_types.Inactive
         in
+        state := State_tree.add key (ButtonState button_state) !state;
         let c =
-          if button_state.action = Hovering then
+          if button_state.action = ClickHeld then
+            Button.get_hover_col c_hover c_click button_state
+          else if button_state.action = Hovering then
             Button.get_hover_col c_unselected c_hover button_state
-          else c_unselected
+          else Button.get_hover_col c_unselected c_hover button_state
         in
         Raylib.draw_rectangle_rounded rect r 0 c;
         let _ = draw_rec parent_x parent_y w h d in

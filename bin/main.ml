@@ -14,6 +14,7 @@ let placeholder =
                   0.0,
                   Raylib.Color.green,
                   Raylib.Color.red,
+                  Raylib.Color.darkgreen,
                   Empty );
               Padding
                 ( 10,
@@ -27,6 +28,7 @@ let placeholder =
                       0.2,
                       Raylib.Color.beige,
                       Raylib.Color.orange,
+                      Raylib.Color.darkgreen,
                       Empty ) );
             ] );
       Column
@@ -42,6 +44,7 @@ let placeholder =
                   0.4,
                   Raylib.Color.darkgreen,
                   Raylib.Color.yellow,
+                  Raylib.Color.darkbrown,
                   Empty ) );
           Border
             ( 0.2,
@@ -53,6 +56,7 @@ let placeholder =
                   200,
                   0.2,
                   Raylib.Color.orange,
+                  Raylib.Color.darkbrown,
                   Raylib.Color.black,
                   Empty ) );
         ];
@@ -65,17 +69,19 @@ let setup () =
   Raylib.init_window width height "raylib [core] example - basic window";
   ()
 
-let rec loop () =
+let rec loop state =
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false ->
       let open Raylib in
       begin_drawing ();
       clear_background Color.raywhite;
-      let _ = Reyml.draw placeholder Reyml.empty_state in
+      let state = Reyml.draw placeholder state in
       draw_text "Congrats! You created your first window!" 190 200 20
         Color.lightgray;
       end_drawing ();
-      loop ()
+      loop state
 
-let () = setup () |> loop
+let () =
+  let _ = setup () in
+  loop Reyml.empty_state

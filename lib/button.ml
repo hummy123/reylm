@@ -1,19 +1,21 @@
 open Button_types
 
-let reduce key state_tree action =
-  let state =
-    match State_tree.find_opt key state_tree with
-    | Some (ButtonState x) -> x
-    | _ -> initial_button_state
-  in
+let reduce state action =
   match action with
   | Hovering ->
       let anim_value = state.anim_value +. 0.05 in
       let anim_value = if anim_value >= 1.0 then 1.0 else anim_value in
-      let state : state = { action = Hovering; anim_value } in
-      State_tree.add key (ButtonState state) state_tree
-      (* .ClickHeld -> *)
-  | _ -> State_tree.add key (ButtonState initial_button_state) state_tree
+      { action = Hovering; anim_value }
+  | ClickHeld ->
+      let anim_value =
+        if state.action <> ClickHeld then 0.0 else state.anim_value +. 0.05
+      in
+      let anim_value = if anim_value >= 1.0 then 1.0 else anim_value in
+      { action = ClickHeld; anim_value }
+  | Inactive ->
+      let anim_value = state.anim_value -. 0.05 in
+      let anim_value = if anim_value <= 0.0 then 0.0 else anim_value in
+      { state with anim_value }
 
 let get_hover_col c_unselected c_hover (state : state) =
   let r = Raylib.Color.r c_hover in
