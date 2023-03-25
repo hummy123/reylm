@@ -4,9 +4,7 @@ let power num by_power =
   in
   pow (by_power -. 1.0) num
 
-let ease_in_circ x =
-  let x = 1.0 -. power x 2.0 in
-  1.0 -. sqrt x
+let ease_in_sine x = 1.0 -. cos (x *. Float.pi /. 2.0)
 
 let ease_out_circ x =
   let x = power (x -. 1.0) 2.0 in
@@ -17,7 +15,7 @@ let ease_in_col src dst x =
   let r = Raylib.Color.r dst in
   let g = Raylib.Color.g dst in
   let b = Raylib.Color.b dst in
-  let anim_value = int_of_float (ease_in_circ x *. 255.0) in
+  let anim_value = int_of_float (ease_in_sine x *. 255.0) in
   let tint = Raylib.Color.create r g b anim_value in
   Raylib.color_alpha_blend src dst tint
 
