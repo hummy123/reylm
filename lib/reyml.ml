@@ -6,23 +6,12 @@ type top = int
 type right = int
 type bottom = int
 type thickness = float
-type label = string
-type unselected_col = Raylib.Color.t
-type hover_col = Raylib.Color.t
-type click_col = Raylib.Color.t
+type colour = Raylib.Color.t
 
 type drawable =
   | Column of drawable list
   | Row of drawable list
-  | Button of
-      label
-      * width
-      * height
-      * radius
-      * unselected_col
-      * hover_col
-      * click_col
-      * drawable
+  | Button of width * height * radius * colour * drawable
   | Padding of left * top * right * bottom * drawable
   | Box of Raylib.Color.t * drawable
   | Border of radius * Raylib.Color.t * thickness * drawable
@@ -32,10 +21,10 @@ let empty_state = State_tree.empty
 
 let draw view (state : State_tree.state_tree) =
   let state = ref state in
-  let mouse_pos = Raylib.get_mouse_position () in
-  let mouse_x = int_of_float (Raylib.Vector2.x mouse_pos) in
-  let mouse_y = int_of_float (Raylib.Vector2.y mouse_pos) in
-  let did_click = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
+  (* let mouse_pos = Raylib.get_mouse_position () in *)
+  (* let mouse_x = int_of_float (Raylib.Vector2.x mouse_pos) in *)
+  (* let mouse_y = int_of_float (Raylib.Vector2.y mouse_pos) in *)
+  (* let did_click = Raylib.is_mouse_button_down Raylib.MouseButton.Left in *)
   let rec draw_rec parent_x parent_y parent_w parent_h = function
     | Empty -> (0, 0)
     | Box (c, d) ->
@@ -51,37 +40,12 @@ let draw view (state : State_tree.state_tree) =
         in
         Raylib.draw_rectangle_rounded_lines rect r 10 t c;
         (w, h)
-    | Button (key, w, h, r, c_unselected, c_hover, c_click, d) ->
+    | Button (w, h, r, c, d) ->
         let w = if w < parent_w then w else parent_w in
         let h = if h < parent_h then h else parent_h in
         let rect =
           Raylib.Rectangle.create (float_of_int parent_x)
             (float_of_int parent_y) (float_of_int w) (float_of_int h)
-        in
-        let is_hovering =
-          (mouse_x >= parent_x && mouse_x <= parent_x + w)
-          && mouse_y >= parent_y
-          && mouse_y <= parent_y + h
-        in
-        let button_state =
-          match State_tree.find_opt key !state with
-          | Some (ButtonState x) -> x
-          | None -> Button_types.initial_button_state
-        in
-        let button_state =
-          if is_hovering && did_click then
-            Button.reduce button_state Button_types.ClickHeld
-          else if is_hovering then
-            Button.reduce button_state Button_types.Hovering
-          else Button.reduce button_state Button_types.Inactive
-        in
-        state := State_tree.add key (ButtonState button_state) !state;
-        let c =
-          if button_state.action = ClickHeld then
-            Easing.ease_out_col c_click button_state.anim_value
-          else if button_state.action = Hovering then
-            Easing.ease_out_col c_unselected button_state.anim_value
-          else Easing.ease_in_col c_unselected c_hover button_state.anim_value
         in
         Raylib.draw_rectangle_rounded rect r 0 c;
         let c = Raylib.Color.create 218 218 218 255 in
@@ -127,5 +91,4 @@ let draw view (state : State_tree.state_tree) =
   let width = Raylib.get_screen_width () in
   let height = Raylib.get_screen_height () in
   let _ = draw_rec 0 0 width height view in
-  (* let _ = State_tree.draw_labels state in *)
   !state
