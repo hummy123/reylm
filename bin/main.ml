@@ -3,7 +3,7 @@ open Reyml
 let fluent_border parent_x parent_y parent_w parent_h =
   Raylib.draw_line (parent_x + 5)
     (parent_y + parent_h + 1)
-    (parent_w + 5)
+    (parent_x + parent_w - 5)
     (parent_y + parent_h + 1)
     (Raylib.Color.create 0 0 0 32);
   (parent_w, parent_h)
@@ -12,27 +12,25 @@ let fluent_button _ _ width height =
   Rect
     ( width,
       height,
-      0.3,
+      0.2,
       Raylib.Color.create 0 0 0 16,
-      Column
-        [
-          Padding
-            ( 1,
-              1,
-              1,
-              2,
-              Rect
-                ( width - 2,
-                  height - 3,
-                  0.2,
-                  Raylib.Color.create 251 251 251 255,
-                  Other (fluent_border, Empty) ) );
-        ] )
+      Padding
+        ( 1,
+          1,
+          1,
+          2,
+          Rect
+            ( width - 2,
+              height - 3,
+              0.2,
+              Raylib.Color.create 251 251 251 255,
+              Other (fluent_border, Empty) ) ) )
 
 let placeholder =
   Row
     [
       Padding (10, 10, 10, 10, fluent_button () () 160 36);
+      Padding (10, 10, 10, 10, fluent_button () () 320 64);
       Padding
         ( 20,
           20,
