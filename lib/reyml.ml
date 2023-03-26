@@ -13,10 +13,9 @@ type drawable =
   | Row of drawable list
   | Rect of width * height * radius * colour * drawable
   | Padding of left * top * right * bottom * drawable
-  | Box of Raylib.Color.t * drawable
   | Border of radius * Raylib.Color.t * thickness * drawable
   | Empty
-  | Other of (int -> int -> int -> int -> int * int)
+  | Other of (int -> int -> int -> int -> int * int) * drawable
 
 let draw view _ =
   (* let state = ref state in *)
@@ -26,11 +25,6 @@ let draw view _ =
   (* let did_click = Raylib.is_mouse_button_down Raylib.MouseButton.Left in *)
   let rec draw_rec parent_x parent_y parent_w parent_h = function
     | Empty -> (0, 0)
-    | Box (c, d) ->
-        let w, h = draw_rec parent_x parent_y parent_w parent_h d in
-        Raylib.draw_rectangle parent_x parent_y w h c;
-        let _ = draw_rec parent_x parent_y parent_w parent_h d in
-        (w, h)
     | Border (r, c, t, d) ->
         let w, h = draw_rec parent_x parent_y parent_w parent_h d in
         let rect =
@@ -47,12 +41,6 @@ let draw view _ =
             (float_of_int parent_y) (float_of_int w) (float_of_int h)
         in
         Raylib.draw_rectangle_rounded rect r 0 c;
-        let c = Raylib.Color.create 218 218 218 255 in
-        let rect =
-          Raylib.Rectangle.create (float_of_int parent_x)
-            (float_of_int parent_y) (float_of_int w) (float_of_int h)
-        in
-        Raylib.draw_rectangle_rounded_lines rect r 10 1.0 c;
         let _ = draw_rec parent_x parent_y w h d in
         (w, h)
     | Column lst ->
@@ -86,7 +74,9 @@ let draw view _ =
         let max_height = parent_h - (t + b) in
         let c_w, c_h = draw_rec x_start y_start max_width max_height d in
         (c_w + l + r, c_h + t + b)
-    | Other f -> f parent_x parent_y parent_w parent_y
+    | Other (f, d) ->
+        let w, h = f parent_x parent_y parent_w parent_h in
+        draw_rec parent_x parent_y w h d
   in
   let width = Raylib.get_screen_width () in
   let height = Raylib.get_screen_height () in
