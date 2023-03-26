@@ -1,5 +1,22 @@
 open Reyml
 
+let fluent_light parent_x parent_y parent_w parent_h =
+  Raylib.draw_line (parent_x + 3) (parent_y - 1)
+    (parent_x + parent_w - 3)
+    (parent_y - 1)
+    (Raylib.Color.create 255 255 255 64);
+  Raylib.draw_line parent_x parent_y (parent_x + parent_w) parent_y
+    (Raylib.Color.create 255 255 255 32);
+  Raylib.draw_line parent_x (parent_y + 1) (parent_x + parent_w) (parent_y + 1)
+    (Raylib.Color.create 255 255 255 16);
+  Raylib.draw_line parent_x (parent_y + 2) (parent_x + parent_w) (parent_y + 2)
+    (Raylib.Color.create 255 255 255 8);
+  Raylib.draw_line parent_x (parent_y + 3) (parent_x + parent_w) (parent_y + 3)
+    (Raylib.Color.create 255 255 255 4);
+  Raylib.draw_line parent_x (parent_y + 4) (parent_x + parent_w) (parent_y + 4)
+    (Raylib.Color.create 255 255 255 2);
+  (parent_w, parent_h)
+
 let fluent_shadow parent_x parent_y parent_w parent_h =
   Raylib.draw_line parent_x (parent_y + parent_h) (parent_x + parent_w)
     (parent_y + parent_h)
@@ -36,7 +53,9 @@ let fluent_button _ _ width height =
               height - 2,
               0.2,
               Raylib.Color.create 251 251 251 255,
-              Other (fluent_shadow, Empty) ) ) )
+              Column
+                [ Other (fluent_light, Empty); Other (fluent_shadow, Empty) ] )
+        ) )
 
 let placeholder =
   Row
