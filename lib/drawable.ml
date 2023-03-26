@@ -15,9 +15,17 @@ type drawable =
   | Padding of left * top * right * bottom * drawable
   | Border of radius * Raylib.Color.t * thickness * drawable
   | Empty
-  | Other of (int -> int -> int -> int -> int * int) * drawable
+  | Other of
+      (int ->
+      int ->
+      int ->
+      int ->
+      State_tree.state_tree ->
+      int * int * State_tree.state_tree)
+      * drawable
 
-let rec draw_widget parent_x parent_y parent_w parent_h state_tree = function
+let rec draw_widget parent_x parent_y parent_w parent_h
+    (state_tree : State_tree.state_tree) = function
   | Empty -> (0, 0, state_tree)
   | Border (r, c, t, d) ->
       let w, h, state_tree =
@@ -79,7 +87,7 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree = function
       in
       (c_w + l + r, c_h + t + b, state_tree)
   | Other (f, d) ->
-      let w, h = f parent_x parent_y parent_w parent_h in
+      let w, h, state_tree = f parent_x parent_y parent_w parent_h state_tree in
       let _, _, state_tree = draw_widget parent_x parent_y w h state_tree d in
       (w, h, state_tree)
 

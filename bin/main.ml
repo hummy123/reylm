@@ -1,9 +1,10 @@
 open Reyml
+open Reyml.Drawable
 
 let placeholder =
   Row
     [
-      Other (fluent_button, Empty);
+      Other (Fluent.button, Empty);
       Column
         [
           Rect
@@ -29,7 +30,7 @@ let rec loop state =
       let open Raylib in
       begin_drawing ();
       clear_background (Color.create 243 243 243 255);
-      let state = Reyml.draw placeholder state in
+      let state = Reyml.Drawable.draw placeholder state in
       draw_text "Congrats! You created your first window!" 190 200 20
         Color.lightgray;
       end_drawing ();
@@ -37,4 +38,4 @@ let rec loop state =
 
 let () =
   let _ = setup () in
-  loop ()
+  loop Reyml.initial_state

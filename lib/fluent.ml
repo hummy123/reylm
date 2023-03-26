@@ -1,7 +1,8 @@
 open Drawable
 
-let fluent_button ?(width = 160) ?(height = 32) parent_x parent_y _ _ =
-  let light parent_x parent_y parent_w parent_h ~lightest_alpha =
+let button ?(width = 160) ?(height = 32) parent_x parent_y _ _
+    (state_tree : State_tree.state_tree) =
+  let light ~lightest_alpha parent_x parent_y parent_w parent_h state_tree =
     Raylib.draw_line (parent_x + 3) (parent_y - 1)
       (parent_x + parent_w - 3)
       (parent_y - 1)
@@ -16,10 +17,10 @@ let fluent_button ?(width = 160) ?(height = 32) parent_x parent_y _ _ =
       (Raylib.Color.create 255 255 255 (lightest_alpha / 16));
     Raylib.draw_line parent_x (parent_y + 4) (parent_x + parent_w) (parent_y + 4)
       (Raylib.Color.create 255 255 255 (lightest_alpha / 32));
-    (parent_w, parent_h)
+    (parent_w, parent_h, state_tree)
   in
 
-  let shadow parent_x parent_y parent_w parent_h ~darkest_alpha =
+  let shadow ~darkest_alpha parent_x parent_y parent_w parent_h state_tree =
     Raylib.draw_line parent_x (parent_y + parent_h) (parent_x + parent_w)
       (parent_y + parent_h)
       (Raylib.Color.create 0 0 0 (darkest_alpha / 8));
@@ -37,7 +38,7 @@ let fluent_button ?(width = 160) ?(height = 32) parent_x parent_y _ _ =
       (parent_x + parent_w - 4)
       (parent_y + parent_h + 1)
       (Raylib.Color.create 0 0 0 darkest_alpha);
-    (parent_w, parent_h)
+    (parent_w, parent_h, state_tree)
   in
 
   let mouse = Raylib.get_mouse_position () in
@@ -77,5 +78,7 @@ let fluent_button ?(width = 160) ?(height = 32) parent_x parent_y _ _ =
                     Other (shadow ~darkest_alpha:dark_alpha, Empty);
                   ] ) ) )
   in
-  let _ = draw_widget parent_x parent_y width height view in
-  (width, height)
+  let _, _, state_tree =
+    draw_widget parent_x parent_y width height state_tree view
+  in
+  (width, height, state_tree)
