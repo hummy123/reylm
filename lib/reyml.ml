@@ -11,7 +11,7 @@ type colour = Raylib.Color.t
 type drawable =
   | Column of drawable list
   | Row of drawable list
-  | Button of width * height * radius * colour * drawable
+  | Rect of width * height * radius * colour * drawable
   | Padding of left * top * right * bottom * drawable
   | Box of Raylib.Color.t * drawable
   | Border of radius * Raylib.Color.t * thickness * drawable
@@ -40,7 +40,7 @@ let draw view (state : State_tree.state_tree) =
         in
         Raylib.draw_rectangle_rounded_lines rect r 10 t c;
         (w, h)
-    | Button (w, h, r, c, d) ->
+    | Rect (w, h, r, c, d) ->
         let w = if w < parent_w then w else parent_w in
         let h = if h < parent_h then h else parent_h in
         let rect =

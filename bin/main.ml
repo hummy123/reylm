@@ -1,42 +1,20 @@
 open Reyml
 
-let button ~name ~width ~height ~radius ~c1 ~c2 ~c3 ~child =
-  Button (name, width, height, radius, c1, c2, c3, child)
+let button ~width ~height ~radius ~c1 ~child =
+  Rect (width, height, radius, c1, child)
 
 let col1 _ _ _ =
   Column
     [
-      Button
-        ( "first",
-          20,
-          200,
-          0.0,
-          Raylib.Color.green,
-          Raylib.Color.red,
-          Raylib.Color.darkgreen,
-          Empty );
-      Padding
-        ( 10,
-          20,
-          30,
-          40,
-          Button
-            ( "second",
-              100,
-              400,
-              0.2,
-              Raylib.Color.beige,
-              Raylib.Color.orange,
-              Raylib.Color.darkgreen,
-              Empty ) );
+      Rect (20, 200, 0.0, Raylib.Color.green, Empty);
+      Padding (10, 20, 30, 40, Rect (100, 400, 0.2, Raylib.Color.beige, Empty));
     ]
 
 let placeholder =
   Row
     [
       Box (Raylib.Color.black, col1 "asdf" 2 6);
-      button ~name:"sadf" ~width:200 ~height:400 ~radius:0.2
-        ~c1:Raylib.Color.red ~c2:Raylib.Color.yellow ~c3:Raylib.Color.orange
+      button ~width:200 ~height:400 ~radius:0.2 ~c1:Raylib.Color.red
         ~child:Empty;
       Column
         [
@@ -44,43 +22,19 @@ let placeholder =
             ( 10.0,
               Raylib.Color.raywhite,
               4.0,
-              Button
-                ( "third",
-                  50,
-                  300,
-                  0.4,
-                  Raylib.Color.darkgreen,
-                  Raylib.Color.yellow,
-                  Raylib.Color.darkbrown,
-                  Empty ) );
+              Rect (50, 300, 0.4, Raylib.Color.darkgreen, Empty) );
           Border
             ( 0.2,
               Raylib.Color.pink,
               1.0,
-              Button
-                ( "fourth",
-                  200,
-                  200,
-                  0.2,
-                  Raylib.Color.orange,
-                  Raylib.Color.darkbrown,
-                  Raylib.Color.black,
-                  Empty ) );
+              Rect (200, 200, 0.2, Raylib.Color.orange, Empty) );
         ];
       Padding
         ( 50,
           50,
           50,
           50,
-          Button
-            ( "5",
-              80,
-              60,
-              0.1,
-              Raylib.Color.create 246 246 246 255,
-              Raylib.Color.create 246 246 246 200,
-              Raylib.Color.create 246 246 246 150,
-              Empty ) );
+          Rect (80, 60, 0.1, Raylib.Color.create 246 246 246 255, Empty) );
     ]
 
 let setup () =
