@@ -1,6 +1,36 @@
 open Drawable
 
-let button ?(width = 160) ?(height = 32) parent_x parent_y _ _
+let get_col (state : Button_state.button_state) =
+  let base_col = Raylib.Color.create 255 255 255 in
+  match state.action with
+  | Button_state.Inactive -> base_col (state.easing *. 255.0 |> int_of_float)
+  | Button_state.Hover ->
+      let anim_value =
+        int_of_float (Easing.ease_in_cubic state.easing *. 255.0)
+      in
+      base_col anim_value
+  | Button_state.ClickHeld ->
+      let anim_value =
+        int_of_float (Easing.ease_in_cubic state.easing *. 255.0)
+      in
+      base_col anim_value
+
+let get_light_alpha (state : Button_state.button_state) =
+  match state.action with
+  | Button_state.Inactive -> 48
+  | Button_state.Hover ->
+      int_of_float (Easing.ease_in_cubic state.easing *. 64.0)
+  | Button_state.ClickHeld ->
+      int_of_float (Easing.ease_in_cubic state.easing *. 12.0)
+
+let get_dark_alpha (state : Button_state.button_state) =
+  match state.action with
+  | Button_state.Inactive -> 12
+  | Button_state.Hover -> int_of_float (Easing.ease_in_cubic state.easing *. 16.)
+  | Button_state.ClickHeld ->
+      int_of_float (Easing.ease_in_cubic state.easing *. 4.)
+
+let button name ?(width = 160) ?(height = 32) parent_x parent_y _ _
     (state_tree : State_tree.state_tree) =
   let light ~lightest_alpha parent_x parent_y parent_w parent_h state_tree =
     Raylib.draw_line (parent_x + 3) (parent_y - 1)
@@ -41,20 +71,31 @@ let button ?(width = 160) ?(height = 32) parent_x parent_y _ _
     (parent_w, parent_h, state_tree)
   in
 
-  let mouse = Raylib.get_mouse_position () in
-  let mouse_x = int_of_float (Raylib.Vector2.x mouse) in
-  let mouse_y = int_of_float (Raylib.Vector2.y mouse) in
-  let is_hovering =
-    (parent_x <= mouse_x && parent_x + width >= mouse_x)
-    && parent_y <= mouse_y
-    && parent_y + height >= mouse_y
+  let reduce state =
+    let mouse = Raylib.get_mouse_position () in
+    let mouse_x = int_of_float (Raylib.Vector2.x mouse) in
+    let mouse_y = int_of_float (Raylib.Vector2.y mouse) in
+    let is_hovering =
+      (parent_x <= mouse_x && parent_x + width >= mouse_x)
+      && parent_y <= mouse_y
+      && parent_y + height >= mouse_y
+    in
+    let did_click = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
+    if is_hovering && did_click then Button_state.reduce state ClickHeld
+    else if is_hovering then Button_state.reduce state Hover
+    else Button_state.reduce state Inactive
   in
-  let did_click = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
-  let col, light_alpha, dark_alpha =
-    if is_hovering && did_click then (Raylib.Color.create 251 251 251 128, 8, 2)
-    else if is_hovering then (Raylib.Color.create 251 251 251 192, 32, 8)
-    else (Raylib.Color.create 251 251 251 255, 48, 12)
+
+  let state =
+    match State_tree.find_opt name state_tree with
+    | Some (Button x) -> reduce x
+    | _ -> reduce Button_state.initial
   in
+  let state_tree = State_tree.add name (Button state) state_tree in
+
+  let col = get_col state in
+  let light_alpha = get_light_alpha state in
+  let dark_alpha = get_dark_alpha state in
 
   let view =
     Rect

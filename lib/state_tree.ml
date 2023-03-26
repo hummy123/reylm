@@ -1,8 +1,6 @@
-type state = ButtonState
 type label = string
+type state = Button of Button_state.button_state
 type state_tree = SE | ST of int * state_tree * label * state * state_tree
-
-let empty = SE
 
 (* AVL Tree balancing functions (not inteeresting to domain). *)
 let ht = function SE -> 0 | ST (h, _, _, _, _) -> h
