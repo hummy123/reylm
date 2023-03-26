@@ -52,7 +52,7 @@ let fluent_button parent_x parent_y parent_width parent_height ~width ~height =
   let col, light_alpha, dark_alpha =
     if is_hovering && did_click then (Raylib.Color.create 251 251 251 128, 8, 2)
     else if is_hovering then (Raylib.Color.create 251 251 251 192, 32, 8)
-    else (Raylib.Color.create 251 251 251 255, 64, 16)
+    else (Raylib.Color.create 251 251 251 255, 48, 12)
   in
 
   let view =
@@ -77,52 +77,20 @@ let fluent_button parent_x parent_y parent_width parent_height ~width ~height =
                     Other (shadow ~darkest_alpha:dark_alpha, Empty);
                   ] ) ) )
   in
-  let w, h = Reyml.draw_control parent_x parent_y width height view in
-  (w, h)
+  let _ = Reyml.draw_control parent_x parent_y width height view in
+  (width, height)
 
 let placeholder =
   Row
     [
-      Padding
-        (10, 10, 10, 10, Other (fluent_button ~width:160 ~height:32, Empty));
+      Other (fluent_button ~width:160 ~height:32, Empty);
+      Rect
+        ( 81,
+          41,
+          0.3,
+          Raylib.Color.create 0 0 0 0,
+          Rect (80, 40, 0.2, Raylib.Color.create 0 0 0 255, Empty) );
     ]
-(* Padding *)
-(*   ( 20, *)
-(*     20, *)
-(*     20, *)
-(*     20, *)
-(*     Rect *)
-(*       ( 81, *)
-(*         41, *)
-(*         0.3, *)
-(*         Raylib.Color.create 0 0 0 10, *)
-(*         Rect (80, 40, 0.2, Raylib.Color.create 246 246 246 255, Empty) ) *)
-(*   ); *)
-(* Column *)
-(*   [ *)
-(*     Border *)
-(*       ( 10.0, *)
-(*         Raylib.Color.raywhite, *)
-(*         4.0, *)
-(*         Rect (50, 300, 0.4, Raylib.Color.darkgreen, Empty) ); *)
-(*     (* Border *) *)
-(*   ( 0.2, *)
-(*     Raylib.Color.pink, *)
-(*     1.0, *)
-(*     Rect *)
-(*       ( 200, *)
-(*         200, *)
-(*         0.2, *)
-(*         Raylib.Color.orange, *)
-(*         Other (fluent_shadow, Empty) ) ); *)
-(* ]; *)
-(* Padding *)
-(*   ( 50, *)
-(*     50, *)
-(*     50, *)
-(*     50, *)
-(*     Rect (80, 60, 0.1, Raylib.Color.create 246 246 246 255, Empty) ); *)
-(* ] *)
 
 let setup () =
   let width = Raylib.get_monitor_width 0 in
