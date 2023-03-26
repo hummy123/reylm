@@ -3,7 +3,7 @@ open Drawable
 let get_col (state : Button_state.button_state) =
   let base_col = Raylib.Color.create 255 255 255 in
   match state.action with
-  | Button_state.Inactive -> base_col (state.easing *. 255.0 |> int_of_float)
+  | Button_state.Inactive -> base_col 255
   | Button_state.Hover ->
       let anim_value =
         int_of_float (Easing.ease_in_cubic state.easing *. 255.0)
@@ -17,16 +17,16 @@ let get_col (state : Button_state.button_state) =
 
 let get_light_alpha (state : Button_state.button_state) =
   match state.action with
-  | Button_state.Inactive -> 48
+  | Button_state.Inactive -> 64
   | Button_state.Hover ->
-      int_of_float (Easing.ease_in_cubic state.easing *. 64.0)
+      int_of_float (Easing.ease_in_cubic state.easing *. 48.0)
   | Button_state.ClickHeld ->
       int_of_float (Easing.ease_in_cubic state.easing *. 12.0)
 
 let get_dark_alpha (state : Button_state.button_state) =
   match state.action with
-  | Button_state.Inactive -> 12
-  | Button_state.Hover -> int_of_float (Easing.ease_in_cubic state.easing *. 16.)
+  | Button_state.Inactive -> 16
+  | Button_state.Hover -> int_of_float (Easing.ease_in_cubic state.easing *. 12.)
   | Button_state.ClickHeld ->
       int_of_float (Easing.ease_in_cubic state.easing *. 4.)
 

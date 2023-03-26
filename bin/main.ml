@@ -4,7 +4,8 @@ open Reyml.Drawable
 let placeholder =
   Row
     [
-      Other (Fluent.button, Empty);
+      Padding
+        (10, 10, 10, 10, Other (Fluent.button "first fluent button", Empty));
       Column
         [
           Rect
