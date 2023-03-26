@@ -1,6 +1,6 @@
 open Reyml
 
-let fluent_button parent_x parent_y parent_width parent_height ~width ~height =
+let fluent_button ?(width = 160) ?(height = 32) parent_x parent_y _ _ =
   let light parent_x parent_y parent_w parent_h ~lightest_alpha =
     Raylib.draw_line (parent_x + 3) (parent_y - 1)
       (parent_x + parent_w - 3)
@@ -83,13 +83,16 @@ let fluent_button parent_x parent_y parent_width parent_height ~width ~height =
 let placeholder =
   Row
     [
-      Other (fluent_button ~width:160 ~height:32, Empty);
-      Rect
-        ( 81,
-          41,
-          0.3,
-          Raylib.Color.create 0 0 0 0,
-          Rect (80, 40, 0.2, Raylib.Color.create 0 0 0 255, Empty) );
+      Other (fluent_button, Empty);
+      Column
+        [
+          Rect
+            ( 81,
+              41,
+              0.3,
+              Raylib.Color.create 0 0 0 0,
+              Rect (80, 40, 0.2, Raylib.Color.create 0 0 0 255, Empty) );
+        ];
     ]
 
 let setup () =
