@@ -1,8 +1,5 @@
 open Reyml
 
-let button ~width ~height ~radius ~c1 ~child =
-  Rect (width, height, radius, c1, child)
-
 let col1 _ _ _ =
   Column
     [
@@ -14,8 +11,6 @@ let placeholder =
   Row
     [
       Box (Raylib.Color.black, col1 "asdf" 2 6);
-      button ~width:200 ~height:400 ~radius:0.2 ~c1:Raylib.Color.red
-        ~child:Empty;
       Column
         [
           Border
@@ -59,4 +54,4 @@ let rec loop state =
 
 let () =
   let _ = setup () in
-  loop Reyml.empty_state
+  loop ()

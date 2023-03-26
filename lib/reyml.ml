@@ -16,11 +16,10 @@ type drawable =
   | Box of Raylib.Color.t * drawable
   | Border of radius * Raylib.Color.t * thickness * drawable
   | Empty
+  | Other of (int -> int -> int -> int -> int * int)
 
-let empty_state = State_tree.empty
-
-let draw view (state : State_tree.state_tree) =
-  let state = ref state in
+let draw view _ =
+  (* let state = ref state in *)
   (* let mouse_pos = Raylib.get_mouse_position () in *)
   (* let mouse_x = int_of_float (Raylib.Vector2.x mouse_pos) in *)
   (* let mouse_y = int_of_float (Raylib.Vector2.y mouse_pos) in *)
@@ -87,8 +86,10 @@ let draw view (state : State_tree.state_tree) =
         let max_height = parent_h - (t + b) in
         let c_w, c_h = draw_rec x_start y_start max_width max_height d in
         (c_w + l + r, c_h + t + b)
+    | Other f -> f parent_x parent_y parent_w parent_y
   in
   let width = Raylib.get_screen_width () in
   let height = Raylib.get_screen_height () in
   let _ = draw_rec 0 0 width height view in
-  !state
+  (* !state *)
+  ()
