@@ -78,12 +78,18 @@ let draw view (state : State_tree.state_tree) =
         state := State_tree.add key (ButtonState button_state) !state;
         let c =
           if button_state.action = ClickHeld then
-            Easing.ease_out_col c_hover c_click button_state.anim_value
+            Easing.ease_out_col c_click button_state.anim_value
           else if button_state.action = Hovering then
-            Easing.ease_out_col c_unselected c_hover button_state.anim_value
+            Easing.ease_out_col c_unselected button_state.anim_value
           else Easing.ease_in_col c_unselected c_hover button_state.anim_value
         in
         Raylib.draw_rectangle_rounded rect r 0 c;
+        let c = Raylib.Color.create 218 218 218 255 in
+        let rect =
+          Raylib.Rectangle.create (float_of_int parent_x)
+            (float_of_int parent_y) (float_of_int w) (float_of_int h)
+        in
+        Raylib.draw_rectangle_rounded_lines rect r 10 1.0 c;
         let _ = draw_rec parent_x parent_y w h d in
         (w, h)
     | Column lst ->
