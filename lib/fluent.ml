@@ -36,42 +36,53 @@ let get_dark_alpha (state : Button_state.button_state) =
 let button name ?(width = 160) ?(height = 32)
     ?(col = Raylib.Color.create 255 255 255 255) parent_x parent_y _ _
     (state_tree : State_tree.state_tree) =
+  let r = Raylib.Color.r col in
+  let r_light = if r + 10 >= 255 then 255 else r + 10 in
+  let r_dark = if r - 10 <= 0 then 0 else r - 10 in
+  let g = Raylib.Color.g col in
+  let g_light = if g + 10 >= 255 then 255 else g + 10 in
+  let g_dark = if g - 10 <= 0 then 0 else g - 10 in
+  let b = Raylib.Color.b col in
+  let b_light = if b + 10 >= 255 then 255 else b + 10 in
+  let b_dark = if b - 10 <= 0 then 0 else b - 10 in
+
   let light ~lightest_alpha parent_x parent_y parent_w parent_h state_tree =
+    let base_col = Raylib.Color.create r_light g_light b_light in
     Raylib.draw_line (parent_x + 3) (parent_y - 1)
       (parent_x + parent_w - 3)
-      (parent_y - 1)
-      (Raylib.Color.create 255 255 255 lightest_alpha);
+      (parent_y - 1) (base_col lightest_alpha);
     Raylib.draw_line parent_x parent_y (parent_x + parent_w) parent_y
-      (Raylib.Color.create 255 255 255 (lightest_alpha / 2));
+      (base_col (lightest_alpha / 2));
     Raylib.draw_line parent_x (parent_y + 1) (parent_x + parent_w) (parent_y + 1)
-      (Raylib.Color.create 255 255 255 (lightest_alpha / 4));
+      (base_col (lightest_alpha / 4));
     Raylib.draw_line parent_x (parent_y + 2) (parent_x + parent_w) (parent_y + 2)
-      (Raylib.Color.create 255 255 255 (lightest_alpha / 8));
+      (base_col (lightest_alpha / 8));
     Raylib.draw_line parent_x (parent_y + 3) (parent_x + parent_w) (parent_y + 3)
-      (Raylib.Color.create 255 255 255 (lightest_alpha / 16));
+      (base_col (lightest_alpha / 16));
     Raylib.draw_line parent_x (parent_y + 4) (parent_x + parent_w) (parent_y + 4)
-      (Raylib.Color.create 255 255 255 (lightest_alpha / 32));
+      (base_col (lightest_alpha / 32));
     (parent_w, parent_h, state_tree)
   in
 
   let shadow ~darkest_alpha parent_x parent_y parent_w parent_h state_tree =
+    let base_col = Raylib.Color.create r_dark g_dark b_dark in
     Raylib.draw_line parent_x (parent_y + parent_h) (parent_x + parent_w)
       (parent_y + parent_h)
-      (Raylib.Color.create 0 0 0 (darkest_alpha / 8));
+      (base_col (darkest_alpha / 8));
     Raylib.draw_line (parent_x + 1)
       (parent_y + parent_h - 1)
       (parent_x + parent_w - 1)
       (parent_y + parent_h - 1)
-      (Raylib.Color.create 0 0 0 (darkest_alpha / 4));
+      (base_col (darkest_alpha / 4));
     Raylib.draw_line (parent_x + 2) (parent_y + parent_h)
       (parent_x + parent_w - 2)
       (parent_y + parent_h)
-      (Raylib.Color.create 0 0 0 (darkest_alpha / 2));
+      (base_col (darkest_alpha / 2));
     Raylib.draw_line (parent_x + 4)
       (parent_y + parent_h + 1)
       (parent_x + parent_w - 4)
       (parent_y + parent_h + 1)
-      (Raylib.Color.create 0 0 0 darkest_alpha);
+      (base_col darkest_alpha);
     (parent_w, parent_h, state_tree)
   in
 
