@@ -36,21 +36,25 @@ let rec size parent_w parent_h = function
       let h = if h < parent_h then h else parent_h in
       (w, h)
   | Column lst ->
-      List.fold_left
-        (fun (max_w, acc_h) el ->
-          let c_w, c_h = size parent_w parent_h el in
-          let max_w = if c_w > max_w then c_w else max_w in
-          let acc_h = acc_h + c_h in
-          (max_w, acc_h))
-        (0, 0) lst
+      let max_w =
+        List.fold_left
+          (fun max_w el ->
+            let c_w, c_h = size parent_w parent_h el in
+            let max_w = if c_w > max_w then c_w else max_w in
+            max_w)
+          0 lst
+      in
+      (max_w, parent_h)
   | Row lst ->
-      List.fold_left
-        (fun (acc_w, max_h) el ->
-          let c_w, c_h = size parent_w parent_h el in
-          let max_h = if c_h > max_h then c_h else max_h in
-          let acc_w = acc_w + c_w in
-          (acc_w, max_h))
-        (0, 0) lst
+      let max_h =
+        List.fold_left
+          (fun (max_h : int) el ->
+            let _, c_h = size parent_w parent_h el in
+            let max_h = if c_h > max_h then c_h else max_h in
+            max_h)
+          0 lst
+      in
+      (parent_w, max_h)
   | Padding _ -> (parent_w, parent_h)
   | Align (_, _, d) -> size parent_w parent_h d
   | Other (_, f_calc, d) -> f_calc parent_w parent_h d
@@ -92,7 +96,7 @@ let rec draw_widget parent_x parent_y parent_w parent_h
           (parent_y, 0, 0, state_tree)
           lst
       in
-      (w, h, state_tree)
+      (w, parent_h, state_tree)
   | Row lst ->
       let _, w, h, state_tree =
         List.fold_left
@@ -107,7 +111,7 @@ let rec draw_widget parent_x parent_y parent_w parent_h
           (parent_x, 0, 0, state_tree)
           lst
       in
-      (w, h, state_tree)
+      (parent_w, h, state_tree)
   | Padding (l, t, r, b, d) ->
       let x_start = parent_x + l in
       let y_start = parent_y + t in
