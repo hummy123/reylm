@@ -22,7 +22,34 @@ type drawable =
       int ->
       State_tree.state_tree ->
       int * int * State_tree.state_tree)
+      * (int -> int -> drawable -> int * int)
       * drawable
+
+let rec calc parent_w parent_h = function
+  | Empty -> (0, 0)
+  | Border (_, _, _, d) -> calc parent_w parent_h d
+  | Rect (w, h, _, _, _) ->
+      let w = if w < parent_w then w else parent_w in
+      let h = if h < parent_h then h else parent_h in
+      (w, h)
+  | Column lst ->
+      List.fold_left
+        (fun (max_w, acc_h) el ->
+          let c_w, c_h = calc parent_w parent_h el in
+          let max_w = if c_w > max_w then c_w else max_w in
+          let acc_h = acc_h + c_h in
+          (max_w, acc_h))
+        (0, 0) lst
+  | Row lst ->
+      List.fold_left
+        (fun (acc_w, max_h) el ->
+          let c_w, c_h = calc parent_w parent_h el in
+          let max_h = if c_h > max_h then c_h else max_h in
+          let acc_w = acc_w + c_w in
+          (acc_w, max_h))
+        (0, 0) lst
+  | Padding _ -> (parent_w, parent_h)
+  | Other (_, f_calc, d) -> f_calc parent_w parent_h d
 
 let rec draw_widget parent_x parent_y parent_w parent_h
     (state_tree : State_tree.state_tree) = function
@@ -86,8 +113,10 @@ let rec draw_widget parent_x parent_y parent_w parent_h
         draw_widget x_start y_start max_width max_height state_tree d
       in
       (c_w + l + r, c_h + t + b, state_tree)
-  | Other (f, d) ->
-      let w, h, state_tree = f parent_x parent_y parent_w parent_h state_tree in
+  | Other (f_draw, _, d) ->
+      let w, h, state_tree =
+        f_draw parent_x parent_y parent_w parent_h state_tree
+      in
       let _, _, state_tree = draw_widget parent_x parent_y w h state_tree d in
       (w, h, state_tree)
 
