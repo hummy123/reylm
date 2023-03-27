@@ -5,7 +5,12 @@ let placeholder =
   Row
     [
       Padding
-        (10, 10, 10, 10, Other (Fluent.button "first fluent button", Empty));
+        ( 10,
+          10,
+          10,
+          10,
+          Other (Fluent.button "first fluent button", Fluent.button_size, Empty)
+        );
       Column
         [
           Rect

@@ -130,11 +130,19 @@ let button name ?(width = 160) ?(height = 32)
                 col,
                 Column
                   [
-                    Other (light ~lightest_alpha:light_alpha, Empty);
-                    Other (shadow ~darkest_alpha:dark_alpha, Empty);
+                    Other
+                      ( light ~lightest_alpha:light_alpha,
+                        (fun _ _ _ -> (0, 0)),
+                        Empty );
+                    Other
+                      ( shadow ~darkest_alpha:dark_alpha,
+                        (fun _ _ _ -> (0, 0)),
+                        Empty );
                   ] ) ) )
   in
   let _, _, state_tree =
     draw_widget parent_x parent_y width height state_tree view
   in
   (width, height, state_tree)
+
+let button_size parent_w parent_h _ = (parent_w, parent_h)
