@@ -5,20 +5,28 @@ type model = { counter : int }
 
 let initial_model = { counter = 0 }
 
-let placeholder =
+let placeholder model =
   Align
     ( Middle,
       Middle,
       Row
         [
+          Rect
+            ( model.counter,
+              model.counter,
+              float_of_int model.counter,
+              Raylib.Color.create model.counter model.counter model.counter 255,
+              Empty );
           Padding
             ( 10,
               10,
               10,
               10,
               Other
-                (Fluent.button "first fluent button", Fluent.button_size, Empty)
-            );
+                ( Fluent.button "first fluent button" ~on_click:(fun model ->
+                      { counter = model.counter + 1 }),
+                  Fluent.button_size,
+                  Empty ) );
           Column
             [
               Rect
@@ -69,25 +77,25 @@ let placeholder =
         ] )
 
 let setup () =
-  let width = Raylib.get_monitor_width 0 in
-  let height = Raylib.get_monitor_height 0 in
   Raylib.set_config_flags [ Window_resizable; Vsync_hint ];
-  Raylib.init_window width height "raylib [core] example - basic window";
+  Raylib.init_window 0 0 "raylib [core] example - basic window";
+  Raylib.maximize_window ();
   ()
 
-let rec loop (model : 'a) state =
+let rec loop view (model : 'a) state =
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false ->
+      let current_view = view model in
       let open Raylib in
       begin_drawing ();
       clear_background (Color.create 243 243 243 255);
-      let state, model = Reyml.Drawable.draw model placeholder state in
+      let state, model = Reyml.Drawable.draw model current_view state in
       draw_text "Congrats! You created your first window!" 190 200 20
         Color.lightgray;
       end_drawing ();
-      loop model state
+      loop view model state
 
 let () =
   let _ = setup () in
-  loop initial_model Reyml.initial_state
+  loop placeholder initial_model Reyml.initial_state

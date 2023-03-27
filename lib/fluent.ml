@@ -33,9 +33,10 @@ let get_dark_alpha (state : Button_state.button_state) =
   | Button_state.ClickHeld ->
       int_of_float (Easing.ease_in_cubic state.easing *. 4.)
 
-let button name ?(width = 160) ?(height = 32)
+let button name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
     ?(col = Raylib.Color.create 255 255 255 255) parent_x parent_y _ _
     (state_tree : State_tree.state_tree) model =
+  (* Colours for light/dark. *)
   let r = Raylib.Color.r col in
   let r_light = if r + 10 >= 255 then 255 else r + 10 in
   let r_dark = if r - 10 <= 0 then 0 else r - 10 in
@@ -45,6 +46,18 @@ let button name ?(width = 160) ?(height = 32)
   let b = Raylib.Color.b col in
   let b_light = if b + 10 >= 255 then 255 else b + 10 in
   let b_dark = if b - 10 <= 0 then 0 else b - 10 in
+
+  (* Bools for indicating whether events occured. *)
+  let mouse = Raylib.get_mouse_position () in
+  let mouse_x = int_of_float (Raylib.Vector2.x mouse) in
+  let mouse_y = int_of_float (Raylib.Vector2.y mouse) in
+  let is_hovering =
+    (parent_x <= mouse_x && parent_x + width >= mouse_x)
+    && parent_y <= mouse_y
+    && parent_y + height >= mouse_y
+  in
+  let did_click = Raylib.is_mouse_button_pressed Raylib.MouseButton.Left in
+  let click_held = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
 
   let light ~lightest_alpha parent_x parent_y parent_w parent_h state_tree model
       =
@@ -89,16 +102,7 @@ let button name ?(width = 160) ?(height = 32)
   in
 
   let reduce state =
-    let mouse = Raylib.get_mouse_position () in
-    let mouse_x = int_of_float (Raylib.Vector2.x mouse) in
-    let mouse_y = int_of_float (Raylib.Vector2.y mouse) in
-    let is_hovering =
-      (parent_x <= mouse_x && parent_x + width >= mouse_x)
-      && parent_y <= mouse_y
-      && parent_y + height >= mouse_y
-    in
-    let did_click = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
-    if is_hovering && did_click then Button_state.reduce state ClickHeld
+    if is_hovering && click_held then Button_state.reduce state ClickHeld
     else if is_hovering then Button_state.reduce state Hover
     else Button_state.reduce state Inactive
   in
@@ -109,6 +113,8 @@ let button name ?(width = 160) ?(height = 32)
     | _ -> reduce Button_state.initial
   in
   let state_tree = State_tree.add name (Button state) state_tree in
+
+  let model = if did_click then on_click model else model in
 
   let col = get_col state col in
   let light_alpha = get_light_alpha state in
