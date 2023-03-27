@@ -7,6 +7,8 @@ type right = int
 type bottom = int
 type thickness = float
 type colour = Raylib.Color.t
+type vert_align = Top | Middle | Bottom
+type hor_align = Left | Middle | Right
 
 type drawable =
   | Column of drawable list
@@ -15,6 +17,7 @@ type drawable =
   | Padding of left * top * right * bottom * drawable
   | Border of radius * Raylib.Color.t * thickness * drawable
   | Empty
+  | Align of vert_align * hor_align * drawable
   | Other of
       (int ->
       int ->
@@ -25,9 +28,9 @@ type drawable =
       * (int -> int -> drawable -> int * int)
       * drawable
 
-let rec calc parent_w parent_h = function
+let rec size parent_w parent_h = function
   | Empty -> (0, 0)
-  | Border (_, _, _, d) -> calc parent_w parent_h d
+  | Border (_, _, _, d) -> size parent_w parent_h d
   | Rect (w, h, _, _, _) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
@@ -35,7 +38,7 @@ let rec calc parent_w parent_h = function
   | Column lst ->
       List.fold_left
         (fun (max_w, acc_h) el ->
-          let c_w, c_h = calc parent_w parent_h el in
+          let c_w, c_h = size parent_w parent_h el in
           let max_w = if c_w > max_w then c_w else max_w in
           let acc_h = acc_h + c_h in
           (max_w, acc_h))
@@ -43,12 +46,13 @@ let rec calc parent_w parent_h = function
   | Row lst ->
       List.fold_left
         (fun (acc_w, max_h) el ->
-          let c_w, c_h = calc parent_w parent_h el in
+          let c_w, c_h = size parent_w parent_h el in
           let max_h = if c_h > max_h then c_h else max_h in
           let acc_w = acc_w + c_w in
           (acc_w, max_h))
         (0, 0) lst
   | Padding _ -> (parent_w, parent_h)
+  | Align (_, _, d) -> size parent_w parent_h d
   | Other (_, f_calc, d) -> f_calc parent_w parent_h d
 
 let rec draw_widget parent_x parent_y parent_w parent_h
@@ -113,6 +117,31 @@ let rec draw_widget parent_x parent_y parent_w parent_h
         draw_widget x_start y_start max_width max_height state_tree d
       in
       (c_w + l + r, c_h + t + b, state_tree)
+  | Align (v, h, d) ->
+      let c_w, c_h = size parent_w parent_h d in
+      let x_pos =
+        match h with
+        | Left -> parent_x
+        | Middle ->
+            let end_x = parent_x + parent_w in
+            let mid_x = (parent_x + end_x) / 2 in
+            mid_x - (c_w / 2)
+        | Right ->
+            let end_x = parent_x + parent_w in
+            end_x - c_w
+      in
+      let y_pos =
+        match v with
+        | Top -> parent_y
+        | Middle ->
+            let end_y = parent_y + parent_h in
+            let mid_y = (parent_y + end_y) / 2 in
+            mid_y - (c_h / 2)
+        | Bottom ->
+            let end_y = parent_y + parent_h in
+            end_y - c_h
+      in
+      draw_widget x_pos y_pos parent_w parent_h state_tree d
   | Other (f_draw, _, d) ->
       let w, h, state_tree =
         f_draw parent_x parent_y parent_w parent_h state_tree
