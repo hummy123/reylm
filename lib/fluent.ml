@@ -1,7 +1,10 @@
 open Drawable
 
-let get_col (state : Button_state.button_state) =
-  let base_col = Raylib.Color.create 255 255 255 in
+let get_col (state : Button_state.button_state) col =
+  let base_col =
+    Raylib.Color.create (Raylib.Color.r col) (Raylib.Color.g col)
+      (Raylib.Color.b col)
+  in
   match state.action with
   | Button_state.Inactive -> base_col 255
   | Button_state.Hover ->
@@ -30,7 +33,8 @@ let get_dark_alpha (state : Button_state.button_state) =
   | Button_state.ClickHeld ->
       int_of_float (Easing.ease_in_cubic state.easing *. 4.)
 
-let button name ?(width = 160) ?(height = 32) parent_x parent_y _ _
+let button name ?(width = 160) ?(height = 32)
+    ?(col = Raylib.Color.create 255 255 255 255) parent_x parent_y _ _
     (state_tree : State_tree.state_tree) =
   let light ~lightest_alpha parent_x parent_y parent_w parent_h state_tree =
     Raylib.draw_line (parent_x + 3) (parent_y - 1)
@@ -93,7 +97,7 @@ let button name ?(width = 160) ?(height = 32) parent_x parent_y _ _
   in
   let state_tree = State_tree.add name (Button state) state_tree in
 
-  let col = get_col state in
+  let col = get_col state col in
   let light_alpha = get_light_alpha state in
   let dark_alpha = get_dark_alpha state in
 
