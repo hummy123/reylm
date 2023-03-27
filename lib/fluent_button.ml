@@ -114,7 +114,7 @@ let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
   in
   let state_tree = State_tree.add name (Button state) state_tree in
 
-  let model = if did_click then on_click model else model in
+  let model = if did_click && is_hovering then on_click model else model in
 
   let col = get_col state col in
   let light_alpha = get_light_alpha state in

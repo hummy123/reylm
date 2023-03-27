@@ -24,7 +24,7 @@ let placeholder model =
               10,
               Other
                 ( Fluent.button "first fluent button" ~on_click:(fun model ->
-                      { counter = model.counter + 1 }),
+                      { counter = model.counter + 100 }),
                   Fluent.button_size,
                   Empty ) );
           Column
