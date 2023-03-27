@@ -35,7 +35,7 @@ let get_dark_alpha (state : Button_state.button_state) =
 
 let button name ?(width = 160) ?(height = 32)
     ?(col = Raylib.Color.create 255 255 255 255) parent_x parent_y _ _
-    (state_tree : State_tree.state_tree) =
+    (state_tree : State_tree.state_tree) model =
   let r = Raylib.Color.r col in
   let r_light = if r + 10 >= 255 then 255 else r + 10 in
   let r_dark = if r - 10 <= 0 then 0 else r - 10 in
@@ -46,7 +46,8 @@ let button name ?(width = 160) ?(height = 32)
   let b_light = if b + 10 >= 255 then 255 else b + 10 in
   let b_dark = if b - 10 <= 0 then 0 else b - 10 in
 
-  let light ~lightest_alpha parent_x parent_y parent_w parent_h state_tree =
+  let light ~lightest_alpha parent_x parent_y parent_w parent_h state_tree model
+      =
     let base_col = Raylib.Color.create r_light g_light b_light in
     Raylib.draw_line (parent_x + 3) (parent_y - 1)
       (parent_x + parent_w - 3)
@@ -61,10 +62,11 @@ let button name ?(width = 160) ?(height = 32)
       (base_col (lightest_alpha / 16));
     Raylib.draw_line parent_x (parent_y + 4) (parent_x + parent_w) (parent_y + 4)
       (base_col (lightest_alpha / 32));
-    (parent_w, parent_h, state_tree)
+    (parent_w, parent_h, state_tree, model)
   in
 
-  let shadow ~darkest_alpha parent_x parent_y parent_w parent_h state_tree =
+  let shadow ~darkest_alpha parent_x parent_y parent_w parent_h state_tree model
+      =
     let base_col = Raylib.Color.create r_dark g_dark b_dark in
     Raylib.draw_line parent_x (parent_y + parent_h) (parent_x + parent_w)
       (parent_y + parent_h)
@@ -83,7 +85,7 @@ let button name ?(width = 160) ?(height = 32)
       (parent_x + parent_w - 4)
       (parent_y + parent_h + 1)
       (base_col darkest_alpha);
-    (parent_w, parent_h, state_tree)
+    (parent_w, parent_h, state_tree, model)
   in
 
   let reduce state =
@@ -140,9 +142,9 @@ let button name ?(width = 160) ?(height = 32)
                         Empty );
                   ] ) ) )
   in
-  let _, _, state_tree =
-    draw_widget parent_x parent_y width height state_tree view
+  let _, _, state_tree, model =
+    draw_widget parent_x parent_y width height state_tree model view
   in
-  (width, height, state_tree)
+  (width, height, state_tree, model)
 
 let button_size parent_w parent_h _ = (parent_w, parent_h)

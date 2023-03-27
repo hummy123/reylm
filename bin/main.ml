@@ -1,6 +1,10 @@
 open Reyml
 open Reyml.Drawable
 
+type model = { counter : int }
+
+let initial_model = { counter = 0 }
+
 let placeholder =
   Align
     ( Middle,
@@ -71,19 +75,19 @@ let setup () =
   Raylib.init_window width height "raylib [core] example - basic window";
   ()
 
-let rec loop state =
+let rec loop (model : 'a) state =
   match Raylib.window_should_close () with
   | true -> Raylib.close_window ()
   | false ->
       let open Raylib in
       begin_drawing ();
       clear_background (Color.create 243 243 243 255);
-      let state = Reyml.Drawable.draw placeholder state in
+      let state, model = Reyml.Drawable.draw model placeholder state in
       draw_text "Congrats! You created your first window!" 190 200 20
         Color.lightgray;
       end_drawing ();
-      loop state
+      loop model state
 
 let () =
   let _ = setup () in
-  loop Reyml.initial_state
+  loop initial_model Reyml.initial_state
