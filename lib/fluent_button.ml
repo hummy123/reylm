@@ -55,6 +55,7 @@ let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
     && parent_y <= mouse_y
     && parent_y + height >= mouse_y
   in
+  let did_click = Raylib.is_mouse_button_pressed Raylib.MouseButton.Left in
   let click_held = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
 
   let light ~lightest_alpha parent_x parent_y parent_w parent_h state_tree model
@@ -99,6 +100,7 @@ let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
     (parent_w, parent_h, state_tree, model)
   in
 
+  (* Manage button state. *)
   let reduce state =
     if is_hovering && click_held then Button_state.reduce state ClickHeld
     else if is_hovering then Button_state.reduce state Hover
@@ -113,10 +115,11 @@ let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
   let state_tree = State_tree.add name (Button state) state_tree in
 
   let model =
-    if Button_state.did_click state && is_hovering then on_click model
+    if (Button_state.did_click state || did_click) && is_hovering then on_click model
     else model
   in
 
+  (* Draw button. *)
   let col = get_col state col in
   let light_alpha = get_light_alpha state in
   let dark_alpha = get_dark_alpha state in
