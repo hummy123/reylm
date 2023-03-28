@@ -12,7 +12,8 @@ let get_font () =
       in
       let font = Raylib.load_font dir in
       Raylib.gen_texture_mipmaps (Raylib.addr (Raylib.Font.texture font));
-      Raylib.set_texture_filter (Raylib.Font.texture font) Raylib.TextureFilter.Bilinear;
+      Raylib.set_texture_filter (Raylib.Font.texture font)
+        Raylib.TextureFilter.Bilinear;
       Hashtbl.add tbl font_key font;
       font
 
