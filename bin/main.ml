@@ -85,7 +85,9 @@ let rec loop view (model : 'a) state =
       begin_drawing ();
       clear_background (Color.create 243 243 243 255);
       let state, model = Reyml.Drawable.draw model current_view state in
-      draw_text "Congrats! You created your first window!" 190 200 20
+      let font = Raylib.load_font "resources/Noto_Sans/NotoSans-Regular.ttf" in
+      let vec = Vector2.create 200. 200. in
+      draw_text_ex font "Congrats! You created your first window!" vec 200. 20.
         Color.lightgray;
       end_drawing ();
       loop view model state

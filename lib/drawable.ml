@@ -61,7 +61,7 @@ let rec size parent_w parent_h = function
       in
       (parent_w, max_h)
   | Text(str, font_size) ->
-      let font = Raylib.load_font "resources/Noto_Sans/NotoSans-Regular.ttf" in
+      let font = Raylib.get_font_default() in
       let s = Raylib.measure_text_ex (font) str font_size 3.0 in
       let w = Raylib.Vector2.x s in
       let h = Raylib.Vector2.y s in
@@ -127,7 +127,7 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
       (parent_w, h, state_tree, model)
   | Text(str, font_size) ->
       let pos = Raylib.Vector2.create (float_of_int parent_x) (float_of_int parent_y) in
-      let font = Raylib.load_font "resources/Noto_Sans/NotoSans-Regular.ttf" in
+      let font = Raylib.get_font_default() in
       Raylib.draw_text_ex font str pos font_size 3.0  Raylib.Color.black;
       let size = Raylib.measure_text_ex font str font_size 204.0 in
       let w = Raylib.Vector2.x size |> int_of_float in
