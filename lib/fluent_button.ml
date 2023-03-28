@@ -115,7 +115,8 @@ let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
   let state_tree = State_tree.add name (Button state) state_tree in
 
   let model =
-    if (Button_state.did_click state || did_click) && is_hovering then on_click model
+    if (Button_state.did_click state || did_click) && is_hovering then
+      on_click model
     else model
   in
 
