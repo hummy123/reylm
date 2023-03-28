@@ -11,12 +11,6 @@ let placeholder model =
       Middle,
       Row
         [
-          Rect
-            ( model.counter,
-              model.counter,
-              float_of_int model.counter,
-              Raylib.Color.create model.counter model.counter model.counter 255,
-              Empty );
           Padding
             ( 10,
               10,
@@ -26,7 +20,7 @@ let placeholder model =
                 ( Fluent.button "first fluent button" ~on_click:(fun model ->
                       { counter = model.counter + 100 }),
                   Fluent.button_size,
-                  Empty ) );
+                  Align(Middle, Middle, Text((Printf.sprintf "%i" model.counter), 24.0) ) ));
           Column
             [
               Rect

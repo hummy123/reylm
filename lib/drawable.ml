@@ -10,9 +10,12 @@ type colour = Raylib.Color.t
 type vert_align = Top | Middle | Bottom
 type hor_align = Left | Middle | Right
 
+(* Load font. *)
+
 (* 'a is type of the domain model for the user's app.' *)
 type 'a drawable =
   | Column of 'a drawable list
+  | Text of string * float
   | Row of 'a drawable list
   | Rect of width * height * radius * colour * 'a drawable
   | Padding of left * top * right * bottom * 'a drawable
@@ -57,6 +60,12 @@ let rec size parent_w parent_h = function
           0 lst
       in
       (parent_w, max_h)
+  | Text(str, font_size) ->
+      let font = Raylib.load_font "resources/Noto_Sans/NotoSans-Regular.ttf" in
+      let s = Raylib.measure_text_ex (font) str font_size 3.0 in
+      let w = Raylib.Vector2.x s in
+      let h = Raylib.Vector2.y s in
+      (int_of_float w, int_of_float h)
   | Padding _ -> (parent_w, parent_h)
   | Align (_, _, d) -> size parent_w parent_h d
   | Other (_, f_calc, d) -> f_calc parent_w parent_h d
@@ -116,6 +125,14 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
           lst
       in
       (parent_w, h, state_tree, model)
+  | Text(str, font_size) ->
+      let pos = Raylib.Vector2.create (float_of_int parent_x) (float_of_int parent_y) in
+      let font = Raylib.load_font "resources/Noto_Sans/NotoSans-Regular.ttf" in
+      Raylib.draw_text_ex font str pos font_size 3.0  Raylib.Color.black;
+      let size = Raylib.measure_text_ex font str font_size 204.0 in
+      let w = Raylib.Vector2.x size |> int_of_float in
+      let h = Raylib.Vector2.y size |> int_of_float in
+      (w, h, state_tree, model)
   | Padding (l, t, r, b, d) ->
       let x_start = parent_x + l in
       let y_start = parent_y + t in
