@@ -10,7 +10,7 @@ let reduce state = function
         let easing = if state.easing <= 0.9 then 0.9 else easing in
         { action = Hover; easing }
       else
-        let easing = state.easing +. 0.2 in
+        let easing = state.easing +. 0.1 in
         let easing = if state.easing >= 0.9 then 0.9 else easing in
         { state with easing }
   | ClickHeld ->
