@@ -21,8 +21,7 @@ let get_col (state : Button_state.button_state) col =
 let get_light_alpha (state : Button_state.button_state) =
   match state.action with
   | Button_state.Inactive -> 64
-  | Button_state.Hover ->
-      int_of_float (Easing.ease_in_circ state.easing *. 48.0)
+  | Button_state.Hover -> int_of_float (Easing.ease_in_circ state.easing *. 48.0)
   | Button_state.ClickHeld ->
       int_of_float (Easing.ease_in_circ state.easing *. 12.0)
 
