@@ -1,3 +1,13 @@
+(rule
+ (deps
+  (source_tree resources))
+ (action
+  (with-stdout-to
+   foo.sexp
+   (system "echo '(' resources/* ')'"))))
+
+(include_subdirs unqualified)
+
 (executable
  (public_name reyml)
  (name main)
