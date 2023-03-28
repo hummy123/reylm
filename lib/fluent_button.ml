@@ -22,16 +22,16 @@ let get_light_alpha (state : Button_state.button_state) =
   match state.action with
   | Button_state.Inactive -> 64
   | Button_state.Hover ->
-      int_of_float (Easing.ease_in_cubic state.easing *. 48.0)
+      int_of_float (Easing.ease_in_circ state.easing *. 48.0)
   | Button_state.ClickHeld ->
-      int_of_float (Easing.ease_in_cubic state.easing *. 12.0)
+      int_of_float (Easing.ease_in_circ state.easing *. 12.0)
 
 let get_dark_alpha (state : Button_state.button_state) =
   match state.action with
   | Button_state.Inactive -> 16
-  | Button_state.Hover -> int_of_float (Easing.ease_in_cubic state.easing *. 12.)
+  | Button_state.Hover -> int_of_float (Easing.ease_in_circ state.easing *. 12.)
   | Button_state.ClickHeld ->
-      int_of_float (Easing.ease_in_cubic state.easing *. 4.)
+      int_of_float (Easing.ease_in_circ state.easing *. 4.)
 
 let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
     ?(col = Raylib.Color.create 255 255 255 255) parent_x parent_y _ _
