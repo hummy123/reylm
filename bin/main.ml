@@ -6,6 +6,7 @@ type model = { counter : int }
 let initial_model = { counter = 0 }
 
 let placeholder model =
+  let counter_text = Printf.sprintf "%i" model.counter in
   Align
     ( Middle,
       Middle,
@@ -20,7 +21,13 @@ let placeholder model =
                 ( Fluent.button "first fluent button" ~on_click:(fun model ->
                       { counter = model.counter + 100 }),
                   Fluent.button_size,
-                  Align(Middle, Middle, Text((Printf.sprintf "%i" model.counter), 24.0) ) ));
+                  Align
+                    ( Middle,
+                      Middle,
+                      Other
+                        ( Fluent.text counter_text,
+                          Fluent.text_size counter_text,
+                          Empty ) ) ) );
           Column
             [
               Rect
@@ -85,10 +92,6 @@ let rec loop view (model : 'a) state =
       begin_drawing ();
       clear_background (Color.create 243 243 243 255);
       let state, model = Reyml.Drawable.draw model current_view state in
-      let font = Raylib.load_font "resources/Noto_Sans/NotoSans-Regular.ttf" in
-      let vec = Vector2.create 200. 200. in
-      draw_text_ex font "Congrats! You created your first window!" vec 200. 20.
-        Color.lightgray;
       end_drawing ();
       loop view model state
 

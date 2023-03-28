@@ -9,12 +9,12 @@ let get_col (state : Button_state.button_state) col =
   | Button_state.Inactive -> base_col 255
   | Button_state.Hover ->
       let anim_value =
-        int_of_float (Easing.ease_in_cubic state.easing *. 255.0)
+        int_of_float (Easing.ease_in_circ state.easing *. 255.0)
       in
       base_col anim_value
   | Button_state.ClickHeld ->
       let anim_value =
-        int_of_float (Easing.ease_in_cubic state.easing *. 255.0)
+        int_of_float (Easing.ease_in_circ state.easing *. 255.0)
       in
       base_col anim_value
 

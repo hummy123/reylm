@@ -8,7 +8,7 @@ let get_font () =
   | None ->
       let dir =
         Raylib.get_application_directory ()
-        ^ "resources/Noto_Sans/NotoSans-Regular.ttf"
+        ^ "resources/NotoSans/NotoSans-Regular.ttf"
       in
       let font = Raylib.load_font dir in
       Hashtbl.add tbl font_key font;
