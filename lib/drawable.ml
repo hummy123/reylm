@@ -14,6 +14,7 @@ type hor_align = Left | Middle | Right
 type 'a drawable =
   | ColumnStart of 'a drawable list
   | ColumnSpaceAround of 'a drawable list
+  | ColumnSpaceBetween of 'a drawable list
   | RowStart of 'a drawable list
   | Rect of width * height * radius * colour * 'a drawable
   | Padding of left * top * right * bottom * 'a drawable
@@ -38,7 +39,7 @@ let rec size parent_w parent_h = function
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       (w, h)
-  | ColumnStart lst | ColumnSpaceAround lst ->
+  | ColumnStart lst | ColumnSpaceAround lst | ColumnSpaceBetween lst ->
       let max_w =
         List.fold_left
           (fun max_w el ->
@@ -120,11 +121,38 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
                 model el
             in
             let y_pos, acc_h =
+              (y_pos + h + vert_gap_size, acc_h + h + vert_gap_size)
+            in
+            (y_pos, acc_h, el_idx + 1, state_tree, model))
+          (parent_y + (vert_gap_size / 2), 0, 0, state_tree, model)
+          lst
+      in
+      (max_width, parent_h, state_tree, model)
+  | ColumnSpaceBetween lst ->
+      let occupied_height, num_els, max_width =
+        List.fold_left
+          (fun (acc_size, num_els, max_width) el ->
+            let w, h = size parent_w parent_h el in
+            (acc_size + h, num_els + 1, if w > max_width then w else max_width))
+          (0, 0, 0) lst
+      in
+      let unoccupied_size = parent_h - occupied_height in
+      let vert_gap_size =
+        if num_els <= 1 then 0 else unoccupied_size / (num_els - 1)
+      in
+      let _, _, _, state_tree, model =
+        List.fold_left
+          (fun (y_pos, acc_h, el_idx, state_tree, model) el ->
+            let _, h, state_tree, model =
+              draw_widget parent_x y_pos max_width (parent_h - acc_h) state_tree
+                model el
+            in
+            let y_pos, acc_h =
               if el_idx = num_els then (y_pos + h, acc_h + h)
               else (y_pos + h + vert_gap_size, acc_h + h + vert_gap_size)
             in
             (y_pos, acc_h, el_idx + 1, state_tree, model))
-          (parent_y + (vert_gap_size / 2), 0, 0, state_tree, model)
+          (parent_y, 0, 0, state_tree, model)
           lst
       in
       (max_width, parent_h, state_tree, model)
