@@ -141,7 +141,7 @@ let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
                 height - 2,
                 0.2,
                 col,
-                Column
+                ColumnStart
                   [
                     Other
                       ( light ~lightest_alpha:light_alpha,
