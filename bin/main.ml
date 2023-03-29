@@ -13,14 +13,13 @@ let placeholder _ =
           0,
           100,
           0,
-          ColumnSpaceBetween [ Rect (100, 100, 0.3, Raylib.Color.red, Empty) ]
-        );
+          ColumnSpaceAround [ Rect (100, 100, 0.3, Raylib.Color.red, Empty) ] );
       Padding
         ( 100,
           0,
           100,
           0,
-          ColumnSpaceBetween
+          ColumnSpaceAround
             [
               Rect (100, 100, 0.3, Raylib.Color.red, Empty);
               Rect (100, 100, 0.3, Raylib.Color.red, Empty);
@@ -30,22 +29,8 @@ let placeholder _ =
           0,
           20,
           0,
-          ColumnSpaceBetween
+          ColumnSpaceAround
             [
-              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-            ] );
-      Padding
-        ( 100,
-          0,
-          20,
-          0,
-          ColumnSpaceBetween
-            [
-              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
               Rect (100, 100, 0.3, Raylib.Color.red, Empty);
               Rect (100, 100, 0.3, Raylib.Color.red, Empty);
               Rect (100, 100, 0.3, Raylib.Color.red, Empty);
@@ -56,7 +41,21 @@ let placeholder _ =
           0,
           20,
           0,
-          ColumnSpaceBetween
+          ColumnSpaceAround
+            [
+              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+              Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+            ] );
+      Padding
+        ( 100,
+          0,
+          20,
+          0,
+          ColumnSpaceAround
             [
               Rect (100, 100, 0.3, Raylib.Color.red, Empty);
               Rect (100, 100, 0.3, Raylib.Color.red, Empty);
