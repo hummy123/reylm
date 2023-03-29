@@ -12,8 +12,9 @@ type hor_align = Left | Middle | Right
 
 (* 'a is type of the domain model for the user's app.' *)
 type 'a drawable =
-  | Column of 'a drawable list
-  | Row of 'a drawable list
+  | ColumnStart of 'a drawable list
+  | ColumnSpaceBetween of 'a drawable list
+  | RowStart of 'a drawable list
   | Rect of width * height * radius * colour * 'a drawable
   | Padding of left * top * right * bottom * 'a drawable
   | Border of radius * Raylib.Color.t * thickness * 'a drawable
@@ -37,7 +38,7 @@ let rec size parent_w parent_h = function
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       (w, h)
-  | Column lst ->
+  | ColumnStart lst | ColumnSpaceBetween lst ->
       let max_w =
         List.fold_left
           (fun max_w el ->
@@ -47,7 +48,7 @@ let rec size parent_w parent_h = function
           0 lst
       in
       (max_w, parent_h)
-  | Row lst ->
+  | RowStart lst ->
       let max_h =
         List.fold_left
           (fun (max_h : int) el ->
@@ -86,7 +87,7 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
         draw_widget parent_x parent_y w h state_tree model d
       in
       (w, h, state_tree, model)
-  | Column lst ->
+  | ColumnStart lst ->
       let _, w, _, state_tree, model =
         List.fold_left
           (fun (y_pos, max_child_w, acc_h, state_tree, model) el ->
@@ -101,7 +102,26 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
           lst
       in
       (w, parent_h, state_tree, model)
-  | Row lst ->
+  | ColumnSpaceBetween lst as widget ->
+      let rec calc_pos_odd start_y end_y lst state_tree model =
+        if lst = [] then (0, 0, state_tree, model)
+        else if List.length lst = 1 then 
+          let el = List.nth lst 0 in
+          let middle = start_y + end_y / 2 in
+          let (el_w, el_h) = size parent_w parent_h el in
+          let half_el_h = el_h / 2 in
+          let middle = middle - half_el_h in
+          let _, _, state_tree, model = draw_widget parent_x middle parent_w parent_h state_tree model el in
+          el_w, el_h, state_tree, model
+        else
+          let middle = start_y + end_y / 2 in
+          let w_prev, h_prev, state_tree, model = calc_pos_odd start_y middle lst state_tree model in
+          let w_next, h_next, state_tree, model = calc_pos_odd middle end_y lst state_tree model in
+          w_prev + w_next, h_prev + h_next, state_tree, model
+      in
+      let w, h = size parent_w parent_h widget in
+      calc_pos_odd parent_y (parent_y + h) lst state_tree model
+  | RowStart lst ->
       let _, _, h, state_tree, model =
         List.fold_left
           (fun (x_pos, acc_w, max_child_h, state_tree, model) el ->
