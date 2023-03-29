@@ -102,10 +102,10 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
           lst
       in
       (w, parent_h, state_tree, model)
-  | ColumnSpaceBetween lst ->
-      let rec calc_pos_odd start_y end_y lst state_tree model cont =
+  | ColumnSpaceBetween lst as widget ->
+      let rec calc_pos_even start_y end_y lst state_tree model cont =
         let list_length = List.length lst in
-        if lst = [] then (0, 0, state_tree, model) |> cont
+        if lst = [] then (state_tree, model) |> cont
         else if list_length = 1 then
           let el = List.nth lst 0 in
           let middle = (start_y + end_y) / 2 in
@@ -115,22 +115,23 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
           let _, _, state_tree, model =
             draw_widget parent_x middle parent_w parent_h state_tree model el
           in
-          (el_w, el_h, state_tree, model) |> cont
+          (state_tree, model) |> cont
         else
           let middle = (start_y + end_y) / 2 in
           let half_length = list_length / 2 in
           let left_list = List.filteri (fun idx _ -> idx < half_length) lst in
           let right_list = List.filteri (fun idx _ -> idx >= half_length) lst in
-          calc_pos_odd start_y middle left_list state_tree model
-            (fun (w_prev, h_prev, state_tree, model) ->
-              calc_pos_odd middle end_y right_list state_tree model (fun x ->
+          calc_pos_even start_y middle left_list state_tree model
+            (fun (state_tree, model) ->
+              calc_pos_even middle end_y right_list state_tree model (fun x ->
                   x |> cont))
       in
-      let w, _, state_tree, model =
-        calc_pos_odd parent_y (parent_y + parent_h) lst state_tree model
+      let state_tree, model =
+        calc_pos_even parent_y (parent_y + parent_h) lst state_tree model
           (fun x -> x)
       in
-      (w, parent_h, state_tree, model)
+      let w, h = size parent_w parent_h widget in
+      (w, h, state_tree, model)
   | RowStart lst ->
       let _, _, h, state_tree, model =
         List.fold_left
