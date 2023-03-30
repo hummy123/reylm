@@ -13,6 +13,8 @@ type hor_align = Left | Middle | Right
 (* 'a is type of the domain model for the user's app.' *)
 type 'a drawable =
   | ColumnStart of 'a drawable list
+  | ColumnCenter of 'a drawable list
+  | ColumnEnd of 'a drawable list
   | ColumnSpaceAround of 'a drawable list
   | ColumnSpaceBetween of 'a drawable list
   | RowStart of 'a drawable list
@@ -39,7 +41,11 @@ let rec size parent_w parent_h = function
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       (w, h)
-  | ColumnStart lst | ColumnSpaceAround lst | ColumnSpaceBetween lst ->
+  | ColumnStart lst
+  | ColumnCenter lst
+  | ColumnEnd lst
+  | ColumnSpaceAround lst
+  | ColumnSpaceBetween lst ->
       let max_w =
         List.fold_left
           (fun max_w el ->
@@ -92,10 +98,9 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
       let _, w, _, state_tree, model =
         List.fold_left
           (fun (y_pos, max_child_w, acc_h, state_tree, model) el ->
-            let max_w = parent_w in
             let max_h = parent_h - acc_h in
             let w, h, state_tree, model =
-              draw_widget parent_x y_pos max_w max_h state_tree model el
+              draw_widget parent_x y_pos parent_w max_h state_tree model el
             in
             let max_child_w = if w > max_child_w then w else max_child_w in
             (y_pos + h, max_child_w, acc_h + h, state_tree, model))
@@ -103,6 +108,29 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
           lst
       in
       (w, parent_h, state_tree, model)
+  | ColumnCenter lst ->
+      let occupied_size, max_width =
+        List.fold_left
+          (fun (acc_size, max_w) el ->
+            let w, h = size parent_w parent_h el in
+            let max_w = if w > max_w then w else max_w in
+            (acc_size + h, max_w))
+          (0, 0) lst
+      in
+      let start_y = parent_y + (parent_h / 2) - (occupied_size / 2) in
+      let _, _, state_tree, model =
+        List.fold_left
+          (fun (y_pos, acc_h, state_tree, model) el ->
+            let max_h = y_pos - acc_h in
+            let _, h, state_tree, model =
+              draw_widget parent_x y_pos max_width max_h state_tree model el
+            in
+            (y_pos + h, acc_h + h, state_tree, model))
+          (start_y, 0, state_tree, model)
+          lst
+      in
+      (max_width, parent_h, state_tree, model)
+  | ColumnEnd _ -> failwith ""
   | ColumnSpaceAround lst ->
       let occupied_height, num_els, max_width =
         List.fold_left
