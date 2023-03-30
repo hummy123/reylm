@@ -14,7 +14,7 @@ let get_col (state : Button_state.button_state) col =
       base_col anim_value
   | Button_state.ClickHeld ->
       let anim_value =
-        int_of_float (Easing.ease_in_circ state.easing *. 255.0)
+        int_of_float (Easing.ease_in_cubic state.easing *. 255.0)
       in
       base_col anim_value
 
@@ -23,7 +23,7 @@ let get_light_alpha (state : Button_state.button_state) =
   | Button_state.Inactive -> 64
   | Button_state.Hover -> int_of_float (Easing.ease_in_circ state.easing *. 48.0)
   | Button_state.ClickHeld ->
-      int_of_float (Easing.ease_in_circ state.easing *. 12.0)
+      int_of_float (Easing.ease_in_cubic state.easing *. 12.0)
 
 let get_dark_alpha (state : Button_state.button_state) =
   match state.action with
@@ -33,18 +33,18 @@ let get_dark_alpha (state : Button_state.button_state) =
       int_of_float (Easing.ease_in_circ state.easing *. 4.)
 
 let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
-    ?(col = Raylib.Color.create 255 255 255 255) parent_x parent_y _ _
+    ?(col = Raylib.Color.create 251 251 251 255) parent_x parent_y _ _
     (state_tree : State_tree.state_tree) model =
   (* Colours for light/dark. *)
   let r = Raylib.Color.r col in
-  let r_light = if r + 10 >= 255 then 255 else r + 10 in
-  let r_dark = if r - 10 <= 0 then 0 else r - 10 in
+  let r_light = if r + 20 >= 255 then 255 else r + 20 in
+  let r_dark = if r - 40 <= 0 then 0 else r - 40 in
   let g = Raylib.Color.g col in
-  let g_light = if g + 10 >= 255 then 255 else g + 10 in
-  let g_dark = if g - 10 <= 0 then 0 else g - 10 in
+  let g_light = if g + 20 >= 255 then 255 else g + 20 in
+  let g_dark = if g - 40 <= 0 then 0 else g - 40 in
   let b = Raylib.Color.b col in
-  let b_light = if b + 10 >= 255 then 255 else b + 10 in
-  let b_dark = if b - 10 <= 0 then 0 else b - 10 in
+  let b_light = if b + 20 >= 255 then 255 else b + 20 in
+  let b_dark = if b - 40 <= 0 then 0 else b - 40 in
 
   (* Bools for indicating whether events occured. *)
   let mouse = Raylib.get_mouse_position () in

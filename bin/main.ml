@@ -10,6 +10,21 @@ let placeholder _ =
     [
       Padding
         ( 100,
+          100,
+          100,
+          100,
+          Other
+            ( Fluent.button "asdf",
+              Fluent.button_size,
+              ColumnSpaceAround
+                [
+                  Other
+                    ( Fluent.text "Standard button",
+                      Fluent.text_size "Standard button",
+                      Empty );
+                ] ) );
+      Padding
+        ( 100,
           0,
           100,
           0,
@@ -68,4 +83,4 @@ let placeholder _ =
             ] );
     ]
 
-let () = Reyml.run_app placeholder initial_model
+let () = Reyml.run_app "Test" placeholder initial_model

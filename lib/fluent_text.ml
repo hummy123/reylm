@@ -18,7 +18,7 @@ let get_font () =
       font
 
 let widget str ?(col = Raylib.Color.create 0 0 0 255) ?(font_size = 24.0)
-    ?(font_spacing = 2.0) parent_x parent_y _ _
+    ?(font_spacing = 0.3) parent_x parent_y _ _
     (state_tree : State_tree.state_tree) model =
   let font = get_font () in
   let pos =
