@@ -130,7 +130,28 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
           lst
       in
       (max_width, parent_h, state_tree, model)
-  | ColumnEnd _ -> failwith ""
+  | ColumnEnd lst ->
+      let occupied_size, max_width =
+        List.fold_left
+          (fun (acc_size, max_w) el ->
+            let w, h = size parent_w parent_h el in
+            let max_w = if w > max_w then w else max_w in
+            (acc_size + h, max_w))
+          (0, 0) lst
+      in
+      let start_y = parent_y + parent_h - occupied_size in
+      let _, _, state_tree, model =
+        List.fold_left
+          (fun (y_pos, acc_h, state_tree, model) el ->
+            let max_h = y_pos - acc_h in
+            let _, h, state_tree, model =
+              draw_widget parent_x y_pos max_width max_h state_tree model el
+            in
+            (y_pos + h, acc_h + h, state_tree, model))
+          (start_y, 0, state_tree, model)
+          lst
+      in
+      (max_width, parent_h, state_tree, model)
   | ColumnSpaceAround lst ->
       let occupied_height, num_els, max_width =
         List.fold_left
