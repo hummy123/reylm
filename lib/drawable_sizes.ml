@@ -21,7 +21,11 @@ let rec size parent_w parent_h = function
           0 lst
       in
       (max_w, parent_h)
-  | RowStart lst ->
+  | RowStart lst
+  | RowCenter lst
+  | RowEnd lst
+  | RowSpaceAround lst
+  | RowSpaceBetween lst ->
       let max_h =
         List.fold_left
           (fun (max_h : int) el ->

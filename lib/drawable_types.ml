@@ -18,6 +18,10 @@ type 'a drawable =
   | ColumnSpaceAround of 'a drawable list
   | ColumnSpaceBetween of 'a drawable list
   | RowStart of 'a drawable list
+  | RowCenter of 'a drawable list
+  | RowEnd of 'a drawable list
+  | RowSpaceAround of 'a drawable list
+  | RowSpaceBetween of 'a drawable list
   | Rect of width * height * radius * colour * 'a drawable
   | Padding of left * top * right * bottom * 'a drawable
   | Border of radius * Raylib.Color.t * thickness * 'a drawable
