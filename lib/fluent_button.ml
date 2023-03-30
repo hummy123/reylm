@@ -33,19 +33,21 @@ let get_dark_alpha (state : Button_state.button_state) =
   | Button_state.ClickHeld ->
       int_of_float (Easing.ease_in_circ state.easing *. 4.)
 
-let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
-    ?(col = Raylib.Color.create 251 251 251 255) parent_x parent_y _ _
-    (state_tree : State_tree.state_tree) model =
+let widget name ?(text = "") ?(width = 160) ?(height = 32)
+    ?(on_click = fun x -> x)
+    ?(background_color = Raylib.Color.create 251 251 251 255)
+    ?(text_color = Raylib.Color.create 32 28 28 255) parent_x parent_y parent_w
+    parent_h (state_tree : State_tree.state_tree) model =
   (* Colours for light/dark. *)
-  let r = Raylib.Color.r col in
+  let r = Raylib.Color.r background_color in
   let r_light = if r + 20 >= 255 then 255 else r + 20 in
-  let r_dark = if r - 40 <= 0 then 0 else r - 40 in
-  let g = Raylib.Color.g col in
+  let r_dark = if r - 80 <= 0 then 0 else r - 80 in
+  let g = Raylib.Color.g background_color in
   let g_light = if g + 20 >= 255 then 255 else g + 20 in
-  let g_dark = if g - 40 <= 0 then 0 else g - 40 in
-  let b = Raylib.Color.b col in
+  let g_dark = if g - 80 <= 0 then 0 else g - 80 in
+  let b = Raylib.Color.b background_color in
   let b_light = if b + 20 >= 255 then 255 else b + 20 in
-  let b_dark = if b - 40 <= 0 then 0 else b - 40 in
+  let b_dark = if b - 80 <= 0 then 0 else b - 80 in
 
   (* Bools for indicating whether events occured. *)
   let mouse = Raylib.get_mouse_position () in
@@ -122,7 +124,7 @@ let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
   in
 
   (* Draw button. *)
-  let col = get_col state col in
+  let button_col = get_col state background_color in
   let light_alpha = get_light_alpha state in
   let dark_alpha = get_dark_alpha state in
 
@@ -141,7 +143,7 @@ let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
               ( width - 2,
                 height - 2,
                 0.2,
-                col,
+                button_col,
                 ColumnStart
                   [
                     Other
@@ -154,7 +156,7 @@ let widget name ?(width = 160) ?(height = 32) ?(on_click = fun x -> x)
                         Empty );
                   ] ) ) )
   in
-  let _, _, state_tree, model =
+  let text_w, text_h, state_tree, model =
     draw_widget parent_x parent_y width height state_tree model view
   in
   (width, height, state_tree, model)
