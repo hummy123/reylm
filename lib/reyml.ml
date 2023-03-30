@@ -1,4 +1,6 @@
-module Drawable = Drawable
+module Drawable_types = Drawable_types
+module Drawable_sizes = Drawable_sizes
+module Drawable_drawing = Drawable_drawing
 module Fluent = Fluent
 
 let run_app ?(background_col = Raylib.Color.create 243 243 243 255) window_title
@@ -11,7 +13,7 @@ let run_app ?(background_col = Raylib.Color.create 243 243 243 255) window_title
         let open Raylib in
         begin_drawing ();
         clear_background background_col;
-        let state, model = Drawable.draw model current_view state in
+        let state, model = Drawable_drawing.draw model current_view state in
         end_drawing ();
         loop view model state
   in

@@ -1,5 +1,5 @@
 open Reyml
-open Reyml.Drawable
+open Reyml.Drawable_types
 
 type model = { counter : int }
 

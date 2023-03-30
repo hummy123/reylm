@@ -1,4 +1,5 @@
-open Drawable
+open Drawable_types
+open Drawable_drawing
 
 let get_col (state : Button_state.button_state) col =
   let base_col =

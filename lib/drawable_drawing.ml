@@ -1,75 +1,31 @@
-type width = int
-type height = int
-type radius = float
-type left = int
-type top = int
-type right = int
-type bottom = int
-type thickness = float
-type colour = Raylib.Color.t
-type vert_align = Top | Middle | Bottom
-type hor_align = Left | Middle | Right
-
-(* 'a is type of the domain model for the user's app.' *)
-type 'a drawable =
-  | ColumnStart of 'a drawable list
-  | ColumnCenter of 'a drawable list
-  | ColumnEnd of 'a drawable list
-  | ColumnSpaceAround of 'a drawable list
-  | ColumnSpaceBetween of 'a drawable list
-  | RowStart of 'a drawable list
-  | Rect of width * height * radius * colour * 'a drawable
-  | Padding of left * top * right * bottom * 'a drawable
-  | Border of radius * Raylib.Color.t * thickness * 'a drawable
-  | Empty
-  | Align of vert_align * hor_align * 'a drawable
-  | Other of
-      (int ->
-      int ->
-      int ->
-      int ->
-      State_tree.state_tree ->
-      'a ->
-      int * int * State_tree.state_tree * 'a)
-      * (int -> int -> 'a drawable -> int * int)
-      * 'a drawable
-
-let rec size parent_w parent_h = function
-  | Empty -> (0, 0)
-  | Border (_, _, _, d) -> size parent_w parent_h d
-  | Rect (w, h, _, _, _) ->
-      let w = if w < parent_w then w else parent_w in
-      let h = if h < parent_h then h else parent_h in
-      (w, h)
-  | ColumnStart lst
-  | ColumnCenter lst
-  | ColumnEnd lst
-  | ColumnSpaceAround lst
-  | ColumnSpaceBetween lst ->
-      let max_w =
-        List.fold_left
-          (fun max_w el ->
-            let c_w, _ = size parent_w parent_h el in
-            let max_w = if c_w > max_w then c_w else max_w in
-            max_w)
-          0 lst
-      in
-      (max_w, parent_h)
-  | RowStart lst ->
-      let max_h =
-        List.fold_left
-          (fun (max_h : int) el ->
-            let _, c_h = size parent_w parent_h el in
-            let max_h = if c_h > max_h then c_h else max_h in
-            max_h)
-          0 lst
-      in
-      (parent_w, max_h)
-  | Padding _ -> (parent_w, parent_h)
-  | Align (_, _, d) -> size parent_w parent_h d
-  | Other (_, f_calc, d) -> f_calc parent_w parent_h d
+open Drawable_types
+open Drawable_sizes
 
 let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
+  (* Abstract some common drawing logic in inner functions. *)
+  let column_center_or_end lst calc_start_y =
+    let occupied_size, max_width =
+      List.fold_left
+        (fun (acc_size, max_w) el ->
+          let w, h = size parent_w parent_h el in
+          let max_w = if w > max_w then w else max_w in
+          (acc_size + h, max_w))
+        (0, 0) lst
+    in
+    let start_y = parent_y + calc_start_y parent_h occupied_size in
+    let _, _, state_tree, model =
+      List.fold_left
+        (fun (y_pos, acc_h, state_tree, model) el ->
+          let max_h = y_pos - acc_h in
+          let _, h, state_tree, model =
+            draw_widget parent_x y_pos max_width max_h state_tree model el
+          in
+          (y_pos + h, acc_h + h, state_tree, model))
+        (start_y, 0, state_tree, model)
+        lst
+    in
+    (max_width, parent_h, state_tree, model)
+  in
   function
   | Empty -> (0, 0, state_tree, model)
   | Border (r, c, t, d) ->
@@ -109,49 +65,11 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
       in
       (w, parent_h, state_tree, model)
   | ColumnCenter lst ->
-      let occupied_size, max_width =
-        List.fold_left
-          (fun (acc_size, max_w) el ->
-            let w, h = size parent_w parent_h el in
-            let max_w = if w > max_w then w else max_w in
-            (acc_size + h, max_w))
-          (0, 0) lst
-      in
-      let start_y = parent_y + (parent_h / 2) - (occupied_size / 2) in
-      let _, _, state_tree, model =
-        List.fold_left
-          (fun (y_pos, acc_h, state_tree, model) el ->
-            let max_h = y_pos - acc_h in
-            let _, h, state_tree, model =
-              draw_widget parent_x y_pos max_width max_h state_tree model el
-            in
-            (y_pos + h, acc_h + h, state_tree, model))
-          (start_y, 0, state_tree, model)
-          lst
-      in
-      (max_width, parent_h, state_tree, model)
+      column_center_or_end lst (fun parent_h occupied_size ->
+          (parent_h / 2) - (occupied_size / 2))
   | ColumnEnd lst ->
-      let occupied_size, max_width =
-        List.fold_left
-          (fun (acc_size, max_w) el ->
-            let w, h = size parent_w parent_h el in
-            let max_w = if w > max_w then w else max_w in
-            (acc_size + h, max_w))
-          (0, 0) lst
-      in
-      let start_y = parent_y + parent_h - occupied_size in
-      let _, _, state_tree, model =
-        List.fold_left
-          (fun (y_pos, acc_h, state_tree, model) el ->
-            let max_h = y_pos - acc_h in
-            let _, h, state_tree, model =
-              draw_widget parent_x y_pos max_width max_h state_tree model el
-            in
-            (y_pos + h, acc_h + h, state_tree, model))
-          (start_y, 0, state_tree, model)
-          lst
-      in
-      (max_width, parent_h, state_tree, model)
+      column_center_or_end lst (fun parent_h occupied_size ->
+          parent_h - occupied_size)
   | ColumnSpaceAround lst ->
       let occupied_height, num_els, max_width =
         List.fold_left
@@ -229,31 +147,6 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
         draw_widget x_start y_start max_width max_height state_tree model d
       in
       (c_w + l + r, c_h + t + b, state_tree, model)
-  | Align (v, h, d) ->
-      let c_w, c_h = size parent_w parent_h d in
-      let x_pos =
-        match h with
-        | Left -> parent_x
-        | Middle ->
-            let end_x = parent_x + parent_w in
-            let mid_x = (parent_x + end_x) / 2 in
-            mid_x - (c_w / 2)
-        | Right ->
-            let end_x = parent_x + parent_w in
-            end_x - c_w
-      in
-      let y_pos =
-        match v with
-        | Top -> parent_y
-        | Middle ->
-            let end_y = parent_y + parent_h in
-            let mid_y = (parent_y + end_y) / 2 in
-            mid_y - (c_h / 2)
-        | Bottom ->
-            let end_y = parent_y + parent_h in
-            end_y - c_h
-      in
-      draw_widget x_pos y_pos parent_w parent_h state_tree model d
   | Other (f_draw, _, d) ->
       let w, h, state_tree, model =
         f_draw parent_x parent_y parent_w parent_h state_tree model
