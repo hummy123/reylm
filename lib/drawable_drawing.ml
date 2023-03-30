@@ -26,6 +26,29 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
     in
     (max_width, parent_h, state_tree, model)
   in
+  let row_center_or_end lst calc_start_x =
+    let occupied_width, max_height =
+      List.fold_left
+        (fun (acc_size, max_h) el ->
+          let w, h = size parent_w parent_h el in
+          let max_h = if h > max_h then h else max_h in
+          (acc_size + w, max_h))
+        (0, 0) lst
+    in
+    let start_x = parent_x + calc_start_x parent_w occupied_width in
+    let _, _, state_tree, model =
+      List.fold_left
+        (fun (x_pos, acc_w, state_tree, model) el ->
+          let max_w = parent_w - acc_w in
+          let w, _, state_tree, model =
+            draw_widget x_pos parent_y max_w parent_h state_tree model el
+          in
+          (x_pos + w, acc_w + w, state_tree, model))
+        (start_x, 0, state_tree, model)
+        lst
+    in
+    (parent_w, max_height, state_tree, model)
+  in
   function
   | Empty -> (0, 0, state_tree, model)
   | Border (r, c, t, d) ->
@@ -138,27 +161,11 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
       in
       (parent_w, h, state_tree, model)
   | RowCenter lst ->
-      let occupied_width, max_height =
-        List.fold_left
-          (fun (acc_size, max_h) el ->
-            let w, h = size parent_w parent_h el in
-            let max_h = if h > max_h then h else max_h in
-            (acc_size + w, max_h))
-          (0, 0) lst
-      in
-      let start_x = parent_x + (parent_w / 2) - (occupied_width / 2) in
-      let _, _, state_tree, model =
-        List.fold_left
-          (fun (x_pos, acc_w, state_tree, model) el ->
-            let max_w = parent_w - acc_w in
-            let w, _, state_tree, model =
-              draw_widget x_pos parent_y max_w parent_h state_tree model el
-            in
-            (x_pos + w, acc_w + w, state_tree, model))
-          (start_x, 0, state_tree, model)
-          lst
-      in
-      (parent_w, max_height, state_tree, model)
+      row_center_or_end lst (fun parent_w occupied_width ->
+          (parent_w / 2) - (occupied_width / 2))
+  | RowEnd lst ->
+      row_center_or_end lst (fun parent_w occupied_width ->
+          parent_w - occupied_width)
   | Padding (l, t, r, b, d) ->
       let x_start = parent_x + l in
       let y_start = parent_y + t in

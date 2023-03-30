@@ -6,15 +6,32 @@ type model = { counter : int }
 let initial_model = { counter = 0 }
 
 let placeholder _ =
-  ColumnCenter [
-  RowCenter
+  ColumnSpaceBetween
     [
-      Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-      Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-      Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-      Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-      Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+      RowStart
+        [
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+        ];
+      RowCenter
+        [
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+        ];
+      RowEnd
+        [
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+          Rect (100, 100, 0.3, Raylib.Color.red, Empty);
+        ];
     ]
-  ]
 
 let () = Reyml.run_app "Test" placeholder initial_model
