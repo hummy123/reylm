@@ -20,16 +20,7 @@ let placeholder _ =
               Other
                 ( Fluent.button "123" ~text:"Standard button",
                   Fluent.button_size,
-                  ColumnCenter
-                    [
-                      RowCenter
-                        [
-                          Other
-                            ( Fluent.text "adsfg",
-                              Fluent.text_size "adsfg",
-                              Empty );
-                        ];
-                    ] ) );
+                  Empty ) );
           Rect (100, 100, 0.3, Raylib.Color.red, Empty);
           Rect (100, 100, 0.3, Raylib.Color.red, Empty);
           Rect (100, 100, 0.3, Raylib.Color.red, Empty);
