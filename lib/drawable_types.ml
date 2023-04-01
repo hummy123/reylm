@@ -25,6 +25,7 @@ type 'a drawable =
   | Rect of width * height * radius * colour * 'a drawable
   | Padding of left * top * right * bottom * 'a drawable
   | Border of radius * Raylib.Color.t * thickness * 'a drawable
+  | HLine of Raylib.Color.t
   | Empty
   | Other of
       (int ->

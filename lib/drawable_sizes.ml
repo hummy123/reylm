@@ -2,6 +2,7 @@ open Drawable_types
 
 let rec size parent_w parent_h = function
   | Empty -> (0, 0)
+  | HLine _ -> (parent_w, 1)
   | Border (_, _, _, d) -> size parent_w parent_h d
   | Rect (w, h, _, _, _) ->
       let w = if w < parent_w then w else parent_w in

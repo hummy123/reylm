@@ -51,6 +51,9 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
   in
   function
   | Empty -> (0, 0, state_tree, model)
+  | HLine col ->
+      Raylib.draw_line parent_x parent_y (parent_x + parent_w) parent_y col;
+      (parent_w, 1, state_tree, model)
   | Border (r, c, t, d) ->
       let w, h, state_tree, model =
         draw_widget parent_x parent_y parent_w parent_h state_tree model d
