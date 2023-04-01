@@ -61,48 +61,6 @@ let widget name ?(text = "") ?(width = 160) ?(height = 32)
   let did_click = Raylib.is_mouse_button_pressed Raylib.MouseButton.Left in
   let click_held = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
 
-  let light ~lightest_alpha parent_x parent_y parent_w parent_h state_tree model
-      =
-    let base_col = Raylib.Color.create r_light g_light b_light in
-    Raylib.draw_line (parent_x + 3) (parent_y - 1)
-      (parent_x + parent_w - 3)
-      (parent_y - 1) (base_col lightest_alpha);
-    Raylib.draw_line parent_x parent_y (parent_x + parent_w) parent_y
-      (base_col (lightest_alpha / 2));
-    Raylib.draw_line parent_x (parent_y + 1) (parent_x + parent_w) (parent_y + 1)
-      (base_col (lightest_alpha / 4));
-    Raylib.draw_line parent_x (parent_y + 2) (parent_x + parent_w) (parent_y + 2)
-      (base_col (lightest_alpha / 8));
-    Raylib.draw_line parent_x (parent_y + 3) (parent_x + parent_w) (parent_y + 3)
-      (base_col (lightest_alpha / 16));
-    Raylib.draw_line parent_x (parent_y + 4) (parent_x + parent_w) (parent_y + 4)
-      (base_col (lightest_alpha / 32));
-    (parent_w, parent_h, state_tree, model)
-  in
-
-  let shadow ~darkest_alpha parent_x parent_y parent_w parent_h state_tree model
-      =
-    let base_col = Raylib.Color.create r_dark g_dark b_dark in
-    Raylib.draw_line parent_x (parent_y + parent_h) (parent_x + parent_w)
-      (parent_y + parent_h)
-      (base_col (darkest_alpha / 8));
-    Raylib.draw_line (parent_x + 1)
-      (parent_y + parent_h - 1)
-      (parent_x + parent_w - 1)
-      (parent_y + parent_h - 1)
-      (base_col (darkest_alpha / 4));
-    Raylib.draw_line (parent_x + 2) (parent_y + parent_h)
-      (parent_x + parent_w - 2)
-      (parent_y + parent_h)
-      (base_col (darkest_alpha / 2));
-    Raylib.draw_line (parent_x + 4)
-      (parent_y + parent_h + 1)
-      (parent_x + parent_w - 4)
-      (parent_y + parent_h + 1)
-      (base_col darkest_alpha);
-    (parent_w, parent_h, state_tree, model)
-  in
-
   (* Manage button state. *)
   let reduce state =
     if is_hovering && click_held then Button_state.reduce state ClickHeld
@@ -125,7 +83,7 @@ let widget name ?(text = "") ?(width = 160) ?(height = 32)
 
   (* Draw button. *)
   let button_col = get_col state background_color in
-  let base_light = Raylib.Color.create r_dark g_dark b_dark in
+  let base_light = Raylib.Color.create r_light g_light b_light in
   let light_alpha = get_light_alpha state in
   let light1 = base_light light_alpha in
   let light2 = base_light (light_alpha / 2) in
@@ -134,7 +92,7 @@ let widget name ?(text = "") ?(width = 160) ?(height = 32)
   let light5 = base_light (light_alpha / 16) in
   let light6 = base_light (light_alpha / 32) in
 
-  let base_dark = Raylib.Color.create 255 255 255 in
+  let base_dark = Raylib.Color.create r_dark g_dark b_dark in
   let dark_alpha = get_dark_alpha state in
   let dark1 = base_dark (dark_alpha / 8) in
   let dark2 = base_dark (dark_alpha / 4) in
@@ -147,23 +105,29 @@ let widget name ?(text = "") ?(width = 160) ?(height = 32)
         height,
         0.2,
         Raylib.Color.create 0 0 0 16,
-        ColumnSpaceBetween
+        Overlay
           [
-            ColumnStart
+            (* Main button area. *)
+            Padding (1, 1, 1, 2, Rect (width, height, 0.2, button_col, Empty));
+            (* Top and bottom shadows. *)
+            ColumnSpaceBetween
               [
-                Padding (3, 0, 3, 0, HLine light1);
-                Padding (2, 0, 2, 0, HLine light2);
-                Padding (1, 0, 1, 0, HLine light3);
-                HLine light4;
-                HLine light5;
-                HLine light6;
-              ];
-            ColumnEnd
-              [
-                HLine dark1;
-                Padding (1, 0, 1, 0, HLine dark2);
-                Padding (2, 0, 2, 0, HLine dark3);
-                Padding (3, 0, 3, 0, HLine dark4);
+                ColumnStart
+                  [
+                    Padding (3, 0, 3, 0, HLine light1);
+                    Padding (2, 0, 2, 0, HLine light2);
+                    Padding (1, 0, 1, 0, HLine light3);
+                    HLine light4;
+                    HLine light5;
+                    HLine light6;
+                  ];
+                ColumnEnd
+                  [
+                    HLine dark1;
+                    Padding (1, 0, 1, 0, HLine dark2);
+                    Padding (2, 0, 2, 0, HLine dark3);
+                    Padding (3, 0, 3, 0, HLine dark4);
+                  ];
               ];
           ] )
   in

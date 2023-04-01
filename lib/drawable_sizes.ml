@@ -36,5 +36,13 @@ let rec size parent_w parent_h = function
           0 lst
       in
       (parent_w, max_h)
-  | Padding (l, t, r, b, d) -> size parent_w parent_h d
+  | Padding (_, _, _, _, d) -> size parent_w parent_h d
+  | Overlay d ->
+      List.fold_left
+        (fun (max_w, max_h) el ->
+          let w, h = size parent_w parent_h el in
+          let w = if w > max_w then w else max_w in
+          let h = if h > max_h then h else max_h in
+          (w, h))
+        (0, 0) d
   | Other (_, f_calc, d) -> f_calc parent_w parent_h d

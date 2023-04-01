@@ -64,6 +64,16 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
       in
       Raylib.draw_rectangle_rounded_lines rect r 10 t c;
       (w, h, state_tree, model)
+  | Overlay d ->
+      List.fold_left
+        (fun (max_w, max_h, state_tree, model) el ->
+          let w, h, state_tree, model =
+            draw_widget parent_x parent_y parent_w parent_h state_tree model el
+          in
+          let w = if w > max_w then w else max_w in
+          let h = if h > max_h then h else max_h in
+          (w, h, state_tree, model))
+        (0, 0, state_tree, model) d
   | Rect (w, h, r, c, d) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
