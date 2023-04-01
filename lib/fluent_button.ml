@@ -133,7 +133,13 @@ let widget name ?(text = "") ?(width = 160) ?(height = 32)
   let light4 = base_light (light_alpha / 8) in
   let light5 = base_light (light_alpha / 16) in
   let light6 = base_light (light_alpha / 32) in
+
+  let base_dark = Raylib.Color.create 255 255 255 in
   let dark_alpha = get_dark_alpha state in
+  let dark1 = base_dark (dark_alpha / 8) in
+  let dark2 = base_dark (dark_alpha / 4) in
+  let dark3 = base_dark (dark_alpha / 2) in
+  let dark4 = base_dark dark_alpha in
 
   let view =
     Rect
@@ -141,22 +147,25 @@ let widget name ?(text = "") ?(width = 160) ?(height = 32)
         height,
         0.2,
         Raylib.Color.create 0 0 0 16,
-        ColumnSpaceBetween 
-        [
-          ColumnStart [
-            Padding(3, 0, 3, 0, HLine(light1));
-            Padding(2, 0, 2, 0, HLine(light2));
-            Padding(1, 0, 1, 0, HLine(light3));
-            HLine(light4);
-            HLine(light5);
-            HLine(light6);
-          ];
-
-          ColumnEnd [
-
-          ]
-        ];
- )
+        ColumnSpaceBetween
+          [
+            ColumnStart
+              [
+                Padding (3, 0, 3, 0, HLine light1);
+                Padding (2, 0, 2, 0, HLine light2);
+                Padding (1, 0, 1, 0, HLine light3);
+                HLine light4;
+                HLine light5;
+                HLine light6;
+              ];
+            ColumnEnd
+              [
+                HLine dark1;
+                Padding (1, 0, 1, 0, HLine dark2);
+                Padding (2, 0, 2, 0, HLine dark3);
+                Padding (3, 0, 3, 0, HLine dark4);
+              ];
+          ] )
   in
   let text_w, text_h, state_tree, model =
     draw_widget parent_x parent_y width height state_tree model view

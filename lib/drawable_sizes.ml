@@ -36,5 +36,5 @@ let rec size parent_w parent_h = function
           0 lst
       in
       (parent_w, max_h)
-  | Padding _ -> (parent_w, parent_h)
+  | Padding (l, t, r, b, d) -> size parent_w parent_h d
   | Other (_, f_calc, d) -> f_calc parent_w parent_h d
