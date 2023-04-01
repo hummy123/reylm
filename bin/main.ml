@@ -12,15 +12,7 @@ let placeholder _ =
         [
           Rect (100, 100, 0.3, Raylib.Color.red, Empty);
           Rect (100, 100, 0.3, Raylib.Color.red, Empty);
-          Padding
-            ( 50,
-              50,
-              50,
-              50,
-              Other
-                ( Fluent.button "123" ~text:"Standard button",
-                  Fluent.button_size,
-                  Empty ) );
+          Padding (50, 50, 50, 50, Fluent.button "123" ~text:"Standard button");
           Rect (100, 100, 0.3, Raylib.Color.red, Empty);
           Rect (100, 100, 0.3, Raylib.Color.red, Empty);
           Rect (100, 100, 0.3, Raylib.Color.red, Empty);

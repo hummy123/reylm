@@ -37,12 +37,14 @@ let widget name ?(text = "") ?width ?(height = 32) ?(on_click = fun x -> x)
     ?(background_color = Raylib.Color.create 251 251 251 255)
     ?(text_color = Raylib.Color.create 32 28 28 255) parent_x parent_y parent_w
     parent_h (state_tree : State_tree.state_tree) model =
+  let child_width =
+    let width, _ = Fluent_text.size text 0 0 0 in
+    width + 40
+  in
   let width =
     match width with
-    | Some x -> x
-    | None ->
-        let width, _ = Fluent_text.size text 0 0 0 in
-        width + 40
+    | Some x -> if x > child_width then x else child_width
+    | None -> child_width
   in
 
   (* Colours for light/dark. *)
