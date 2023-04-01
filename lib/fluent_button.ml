@@ -125,7 +125,14 @@ let widget name ?(text = "") ?(width = 160) ?(height = 32)
 
   (* Draw button. *)
   let button_col = get_col state background_color in
+  let base_light = Raylib.Color.create r_dark g_dark b_dark in
   let light_alpha = get_light_alpha state in
+  let light1 = base_light light_alpha in
+  let light2 = base_light (light_alpha / 2) in
+  let light3 = base_light (light_alpha / 4) in
+  let light4 = base_light (light_alpha / 8) in
+  let light5 = base_light (light_alpha / 16) in
+  let light6 = base_light (light_alpha / 32) in
   let dark_alpha = get_dark_alpha state in
 
   let view =
@@ -134,27 +141,22 @@ let widget name ?(text = "") ?(width = 160) ?(height = 32)
         height,
         0.2,
         Raylib.Color.create 0 0 0 16,
-        Padding
-          ( 1,
-            1,
-            1,
-            2,
-            Rect
-              ( width - 2,
-                height - 2,
-                0.2,
-                button_col,
-                ColumnStart
-                  [
-                    Other
-                      ( light ~lightest_alpha:light_alpha,
-                        (fun _ _ _ -> (0, 0)),
-                        Empty );
-                    Other
-                      ( shadow ~darkest_alpha:dark_alpha,
-                        (fun _ _ _ -> (0, 0)),
-                        Empty );
-                  ] ) ) )
+        ColumnSpaceBetween 
+        [
+          ColumnStart [
+            Padding(3, 0, 3, 0, HLine(light1));
+            Padding(2, 0, 2, 0, HLine(light2));
+            Padding(1, 0, 1, 0, HLine(light3));
+            HLine(light4);
+            HLine(light5);
+            HLine(light6);
+          ];
+
+          ColumnEnd [
+
+          ]
+        ];
+ )
   in
   let text_w, text_h, state_tree, model =
     draw_widget parent_x parent_y width height state_tree model view
