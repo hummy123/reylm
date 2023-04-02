@@ -135,7 +135,8 @@ let widget name ?(text = "") ?width ?(height = 32) ?(on_click = fun x -> x)
                 RowCenter
                   [
                     Other
-                      ( Fluent_text.widget text ~col:text_color,
+                      ( Fluent_text.widget text ~col:text_color
+                          ~font_path:Fonts.light,
                         Fluent_text.size text,
                         Empty );
                   ];
