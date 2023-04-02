@@ -73,7 +73,6 @@ let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
     && parent_y <= mouse_y
     && parent_y + height >= mouse_y
   in
-  let did_click = Raylib.is_mouse_button_pressed Raylib.MouseButton.Left in
   let click_held = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
   let click_released = Raylib.is_mouse_button_up Raylib.MouseButton.Left in
 
@@ -91,10 +90,8 @@ let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
   in
 
   let model =
-    if
-      (Button_state.did_click state && click_released)
-      || (did_click && is_hovering)
-    then on_click model
+    if is_hovering && Button_state.did_click state && click_released then
+      on_click model
     else model
   in
   let state = reduce state in
