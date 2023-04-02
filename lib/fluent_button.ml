@@ -33,18 +33,24 @@ let get_dark_alpha (state : Button_state.button_state) =
   | Button_state.ClickHeld ->
       int_of_float (Easing.ease_in_circ state.easing *. 4.)
 
-let widget name ?(text = "") ?width ?(height = 32) ?(on_click = fun x -> x)
+let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
     ?(background_color = Raylib.Color.create 251 251 251 255)
     ?(text_color = Raylib.Color.create 32 28 28 255) parent_x parent_y parent_w
     parent_h (state_tree : State_tree.state_tree) model =
-  let child_width =
-    let width, _ = Fluent_text.size text 0 0 0 in
-    width + 40
+  (* Get minimum width and height if none provided, or if provided width and height are too small. *)
+  let child_width, child_height =
+    let width, height = Fluent_text.size text 0 0 0 in
+    (width + 40, height + 10)
   in
   let width =
     match width with
     | Some x -> if x > child_width then x else child_width
     | None -> child_width
+  in
+  let height =
+    match height with
+    | Some x -> if x > child_height then x else child_height
+    | None -> child_height
   in
 
   (* Colours for light/dark. *)
@@ -155,4 +161,4 @@ let widget name ?(text = "") ?width ?(height = 32) ?(on_click = fun x -> x)
   in
   (width, height, state_tree, model)
 
-let size parent_w parent_h _ = (parent_w, parent_h)
+let size width height _ _ _ = (width, height)

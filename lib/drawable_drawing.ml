@@ -116,9 +116,9 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
       in
       let unoccupied_size = parent_h - occupied_height in
       let vert_gap_size = unoccupied_size / num_els in
-      let _, _, _, state_tree, model =
+      let _, _, state_tree, model =
         List.fold_left
-          (fun (y_pos, acc_h, el_idx, state_tree, model) el ->
+          (fun (y_pos, acc_h, state_tree, model) el ->
             let _, h, state_tree, model =
               draw_widget parent_x y_pos max_width (parent_h - acc_h) state_tree
                 model el
@@ -126,8 +126,8 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
             let y_pos, acc_h =
               (y_pos + h + vert_gap_size, acc_h + h + vert_gap_size)
             in
-            (y_pos, acc_h, el_idx + 1, state_tree, model))
-          (parent_y + (vert_gap_size / 2), 0, 0, state_tree, model)
+            (y_pos, acc_h, state_tree, model))
+          (parent_y + (vert_gap_size / 2), 0, state_tree, model)
           lst
       in
       (max_width, parent_h, state_tree, model)
@@ -143,19 +143,18 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
       let vert_gap_size =
         if num_els <= 1 then 0 else unoccupied_size / (num_els - 1)
       in
-      let _, _, _, state_tree, model =
+      let _, _, state_tree, model =
         List.fold_left
-          (fun (y_pos, acc_h, el_idx, state_tree, model) el ->
+          (fun (y_pos, acc_h, state_tree, model) el ->
             let _, h, state_tree, model =
               draw_widget parent_x y_pos max_width (parent_h - acc_h) state_tree
                 model el
             in
             let y_pos, acc_h =
-              if el_idx = num_els then (y_pos + h, acc_h + h)
-              else (y_pos + h + vert_gap_size, acc_h + h + vert_gap_size)
+              (y_pos + h + vert_gap_size, acc_h + h + vert_gap_size)
             in
-            (y_pos, acc_h, el_idx + 1, state_tree, model))
-          (parent_y, 0, 0, state_tree, model)
+            (y_pos, acc_h, state_tree, model))
+          (parent_y, 0, state_tree, model)
           lst
       in
       (max_width, parent_h, state_tree, model)
@@ -179,6 +178,58 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
   | RowEnd lst ->
       row_center_or_end lst (fun parent_w occupied_width ->
           parent_w - occupied_width)
+  | RowSpaceAround lst ->
+      let occupied_width, num_els, max_height =
+        List.fold_left
+          (fun (acc_size, num_els, max_height) el ->
+            let w, h = size parent_w parent_h el in
+            (acc_size + w, num_els + 1, if h > max_height then h else max_height))
+          (0, 0, 0) lst
+      in
+      let unoccupied_width = parent_w - occupied_width in
+      let hor_gap_size = unoccupied_width / num_els in
+      let _, _, state_tree, model =
+        List.fold_left
+          (fun (x_pos, acc_w, state_tree, model) el ->
+            let w, _, state_tree, model =
+              draw_widget x_pos parent_y (parent_w - acc_w) parent_h state_tree
+                model el
+            in
+            let x_pos, acc_w =
+              (x_pos + w + hor_gap_size, acc_w + w + hor_gap_size)
+            in
+            (x_pos, acc_w, state_tree, model))
+          (parent_x + (hor_gap_size / 2), 0, state_tree, model)
+          lst
+      in
+      (parent_w, max_height, state_tree, model)
+  | RowSpaceBetween lst ->
+      let occupied_width, num_els, max_height =
+        List.fold_left
+          (fun (acc_size, num_els, max_height) el ->
+            let w, h = size parent_w parent_h el in
+            (acc_size + w, num_els + 1, if h > max_height then h else max_height))
+          (0, 0, 0) lst
+      in
+      let unoccupied_width = parent_w - occupied_width in
+      let hor_gap_size =
+        if num_els <= 1 then 0 else unoccupied_width / (num_els - 1)
+      in
+      let _, _, state_tree, model =
+        List.fold_left
+          (fun (x_pos, acc_w, state_tree, model) el ->
+            let w, _, state_tree, model =
+              draw_widget x_pos parent_y (parent_w - acc_w) max_height
+                state_tree model el
+            in
+            let x_pos, acc_w =
+              (x_pos + w + hor_gap_size, acc_w + w + hor_gap_size)
+            in
+            (x_pos, acc_w, state_tree, model))
+          (parent_y, 0, state_tree, model)
+          lst
+      in
+      (parent_w, max_height, state_tree, model)
   | Padding (l, t, r, b, d) ->
       let x_start = parent_x + l in
       let y_start = parent_y + t in

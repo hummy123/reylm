@@ -1,12 +1,28 @@
 open Drawable_types
 
-let button ?(text = "") ?(width = 0) ?(height = 32) ?(on_click = fun x -> x)
+let button ?(text = "") ?width ?height ?(on_click = fun x -> x)
     ?(background_color = Raylib.Color.create 251 251 251 255)
     ?(text_color = Raylib.Color.create 32 28 28 255) name =
+  (* Get minimum width and height if none provided, or if provided width and height are too small. *)
+  let child_width, child_height =
+    let width, height = Fluent_text.size text 0 0 0 in
+    (width + 40, height + 10)
+  in
+  let width =
+    match width with
+    | Some x -> if x > child_width then x else child_width
+    | None -> child_width
+  in
+  let height =
+    match height with
+    | Some x -> if x > child_height then x else child_height
+    | None -> child_height
+  in
+
   Other
     ( Fluent_button.widget name ~text ~width ~height ~on_click ~background_color
         ~text_color,
-      Fluent_button.size,
+      Fluent_button.size width height,
       Empty )
 
 let text ?(col = Raylib.Color.create 32 28 28 255) ?(font_size = 22.0)

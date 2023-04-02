@@ -36,7 +36,9 @@ let rec size parent_w parent_h = function
           0 lst
       in
       (parent_w, max_h)
-  | Padding (_, _, _, _, d) -> size parent_w parent_h d
+  | Padding (l, t, r, b, d) ->
+      let c_w, c_h = size parent_w parent_h d in
+      (c_w + l + r, c_h + t + b)
   | Overlay d ->
       List.fold_left
         (fun (max_w, max_h) el ->
