@@ -75,6 +75,7 @@ let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
   in
   let did_click = Raylib.is_mouse_button_pressed Raylib.MouseButton.Left in
   let click_held = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
+  let click_released = Raylib.is_mouse_button_up Raylib.MouseButton.Left in
 
   (* Manage button state. *)
   let reduce state =
@@ -85,16 +86,19 @@ let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
 
   let state =
     match State_tree.find_opt name state_tree with
-    | Some (Button x) -> reduce x
-    | _ -> reduce Button_state.initial
+    | Some (Button x) -> x
+    | _ -> Button_state.initial
   in
-  let state_tree = State_tree.add name (Button state) state_tree in
 
   let model =
-    if (Button_state.did_click state || did_click) && is_hovering then
-      on_click model
+    if
+      (Button_state.did_click state && click_released)
+      || (did_click && is_hovering)
+    then on_click model
     else model
   in
+  let state = reduce state in
+  let state_tree = State_tree.add name (Button state) state_tree in
 
   (* Draw button. *)
   let button_col = get_col state background_color in

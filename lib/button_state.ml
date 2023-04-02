@@ -15,9 +15,7 @@ let reduce state = function
         let easing = if state.easing >= 0.9 then 0.9 else easing in
         { state with easing; did_click = false }
   | ClickHeld ->
-      let did_click =
-        if state.action <> ClickHeld && not state.did_click then true else false
-      in
+      let did_click = true in
       let easing = if state.easing <= 0.7 then 0.7 else state.easing -. 0.1 in
       { action = ClickHeld; easing; did_click }
   | Inactive ->
