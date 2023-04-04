@@ -3,11 +3,28 @@ open Drawable_types
 let rec size parent_w parent_h = function
   | Empty -> (0, 0)
   | HLine _ -> (parent_w, 1)
+  | VLine _ -> (1, parent_h)
   | Border (_, _, _, d) -> size parent_w parent_h d
   | Rect (w, h, _, _, _) ->
       let w = if w < parent_w then w else parent_w in
       let h = if h < parent_h then h else parent_h in
       (w, h)
+  | HPanel lst ->
+      List.fold_left
+        (fun (acc_w, max_h) el ->
+          let c_w, c_h = size parent_w parent_h el in
+          let max_h = if c_h > max_h then c_h else max_h in
+          let acc_w = acc_w + c_w in
+          (acc_w, max_h))
+        (0, 0) lst
+  | VPanel lst ->
+      List.fold_left
+        (fun (max_w, acc_h) el ->
+          let c_w, c_h = size parent_w parent_h el in
+          let max_w = if c_w > max_w then c_w else max_w in
+          let acc_h = acc_h + c_h in
+          (max_w, acc_h))
+        (0, 0) lst
   | ColumnStart lst
   | ColumnCenter lst
   | ColumnEnd lst

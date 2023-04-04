@@ -10,6 +10,11 @@ type colour = Raylib.Color.t
 
 (* 'a is type of the domain model for the user's app.' *)
 type 'a drawable =
+  | Empty
+  | HLine of Raylib.Color.t
+  | VLine of Raylib.Color.t
+  | HPanel of 'a drawable list
+  | VPanel of 'a drawable list
   | ColumnStart of 'a drawable list
   | ColumnCenter of 'a drawable list
   | ColumnEnd of 'a drawable list
@@ -24,8 +29,6 @@ type 'a drawable =
   | Rect of width * height * radius * colour * 'a drawable
   | Padding of left * top * right * bottom * 'a drawable
   | Border of radius * Raylib.Color.t * thickness * 'a drawable
-  | HLine of Raylib.Color.t
-  | Empty
   | Other of
       (int ->
       int ->
