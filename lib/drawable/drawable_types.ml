@@ -1,3 +1,26 @@
+(* There is a lot of data sent as input to the draw_widget function,
+   and we just define a type for it so it's extensible and easier to keep track of
+   due to fields being named. *)
+type 'a draw_widget_input = {
+  parent_x : int; (* The x coordinate this drawable should start drawing at. *)
+  parent_y : int; (* The y coordinate this drawable should start drawing at. *)
+  parent_w : int;
+      (* The total width of this drawable's parent. This drawable should not go beyond this width. *)
+  parent_h : int;
+      (* The total height of this drawable's parent. This drawable should not go beyond this height. *)
+  state_tree : State_tree.state_tree;
+      (* State tree, passing state of controls such as animations through main loop. *)
+  model : 'a; (* The user's domain model. *)
+}
+
+(* The data returned by each drawable. *)
+type 'a draw_widget_output = {
+  width : int;
+  height : int;
+  state_tree : State_tree.state_tree;
+  model : 'a;
+}
+
 type width = int
 type height = int
 type radius = float
@@ -30,12 +53,6 @@ type 'a drawable =
   | Padding of left * top * right * bottom * 'a drawable
   | Border of radius * Raylib.Color.t * thickness * 'a drawable
   | Other of
-      (int ->
-      int ->
-      int ->
-      int ->
-      State_tree.state_tree ->
-      'a ->
-      int * int * State_tree.state_tree * 'a)
+      ('a draw_widget_input -> int * int * State_tree.state_tree * 'a)
       * (int -> int -> 'a drawable -> int * int)
       * 'a drawable
