@@ -11,7 +11,7 @@ let widget name parent_x parent_y parent_w parent_h state_tree model =
 
   let friction =
     if scroll_x <> 0.0 || scroll_y <> 0.0 then 1.0
-    else if state.friction >= 0.25 then state.friction -. 0.25
+    else if state.friction >= 0.075 then state.friction -. 0.075
     else 0.0
   in
   let open Listview_state in
@@ -25,7 +25,7 @@ let widget name parent_x parent_y parent_w parent_h state_tree model =
   in
   let state = { state with friction; h_dir; v_dir } in
 
-  let friction = Easing.ease_out_cubic friction *. 10. in
+  let friction = Easing.ease_out_cubic friction *. 8. in
   let scroll_y =
     if state.friction > 0.0 then
       if v_dir = 1.0 then scroll_y +. friction
