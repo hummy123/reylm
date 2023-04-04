@@ -89,6 +89,37 @@ let rec draw_widget parent_x parent_y parent_w parent_h state_tree model =
         draw_widget parent_x parent_y w h state_tree model d
       in
       (w, h, state_tree, model)
+  | VPanel lst ->
+      let _, w, h, state_tree, model =
+        List.fold_left
+          (fun (y_pos, max_w, acc_h, state_tree, model) el ->
+            let max_h = parent_h - acc_h in
+            let w, h, state_tree, model =
+              draw_widget parent_x y_pos parent_w max_h state_tree model el
+            in
+            let max_w = if w > max_w then w else max_w in
+            let acc_h = acc_h + h in
+            (y_pos + h, max_w, acc_h, state_tree, model))
+          (0, 0, 0, state_tree, model)
+          lst
+      in
+      (w, h, state_tree, model)
+  | HPanel lst ->
+      let _, w, h, state_tree, model =
+        List.fold_left
+          (fun (x_pos, acc_w, max_h, state_tree, model) el ->
+            let max_child_w = parent_w - acc_w in
+            let w, h, state_tree, model =
+              draw_widget x_pos parent_y max_child_w parent_h state_tree model
+                el
+            in
+            let max_h = if h > max_h then h else max_h in
+            let acc_w = acc_w + w in
+            (x_pos + w, acc_w, max_h, state_tree, model))
+          (0, 0, 0, state_tree, model)
+          lst
+      in
+      (w, h, state_tree, model)
   | ColumnStart lst ->
       let _, w, _, state_tree, model =
         List.fold_left
