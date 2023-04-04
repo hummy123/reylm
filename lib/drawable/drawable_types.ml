@@ -7,8 +7,6 @@ type right = int
 type bottom = int
 type thickness = float
 type colour = Raylib.Color.t
-type vert_align = Top | Middle | Bottom
-type hor_align = Left | Middle | Right
 
 (* 'a is type of the domain model for the user's app.' *)
 type 'a drawable =

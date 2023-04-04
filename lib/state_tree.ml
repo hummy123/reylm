@@ -1,5 +1,9 @@
 type label = string
-type state = Button of Button_state.button_state
+
+type state =
+  | Button of Button_state.button_state
+  | ListView of Listview_state.listview_state
+
 type state_tree = SE | ST of int * state_tree * label * state * state_tree
 
 (* AVL Tree balancing functions (not inteeresting to domain). *)

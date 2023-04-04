@@ -8,7 +8,7 @@ let initial_model = { counter = 0 }
 let placeholder model =
   ColumnStart
     [
-      Rect (90, 90, 0.0, Raylib.Color.blank, Fluent.listview ());
+      Rect (200, 200, 0.0, Raylib.Color.blank, Fluent.listview "arc");
       Rect (90, 90, 0.2, Raylib.Color.red, Empty);
     ]
 

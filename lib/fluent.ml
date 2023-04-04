@@ -32,4 +32,5 @@ let text ?(col = Raylib.Color.create 32 28 28 255) ?(font_size = 22.0)
       Fluent_text.size str ~font_size ~font_spacing,
       Empty )
 
-let listview () = Other (Fluent_listview.widget, Fluent_text.size "asdf", Empty)
+let listview name =
+  Other (Fluent_listview.widget name, Fluent_text.size "asdf", Empty)
