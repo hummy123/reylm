@@ -35,8 +35,7 @@ let get_dark_alpha (state : Button_state.button_state) =
 
 let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
     ?(background_color = Raylib.Color.create 251 251 251 255)
-    ?(text_color = Raylib.Color.create 32 28 28 255) parent_x parent_y parent_w
-    parent_h (state_tree : State_tree.state_tree) model =
+    ?(text_color = Raylib.Color.create 32 28 28 255) input =
   (* Get minimum width and height if none provided, or if provided width and height are too small. *)
   let child_width, child_height =
     let width, height = Fluent_text.size text 0 0 0 in
@@ -69,9 +68,9 @@ let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
   let mouse_x = int_of_float (Raylib.Vector2.x mouse) in
   let mouse_y = int_of_float (Raylib.Vector2.y mouse) in
   let is_hovering =
-    (parent_x <= mouse_x && parent_x + width >= mouse_x)
-    && parent_y <= mouse_y
-    && parent_y + height >= mouse_y
+    (input.parent_x <= mouse_x && input.parent_x + width >= mouse_x)
+    && input.parent_y <= mouse_y
+    && input.parent_y + height >= mouse_y
   in
   let click_held = Raylib.is_mouse_button_down Raylib.MouseButton.Left in
   let click_released = Raylib.is_mouse_button_up Raylib.MouseButton.Left in
@@ -84,18 +83,18 @@ let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
   in
 
   let state =
-    match State_tree.find_opt name state_tree with
+    match State_tree.find_opt name input.state_tree with
     | Some (Button x) -> x
     | _ -> Button_state.initial
   in
 
   let model =
     if is_hovering && Button_state.did_click state && click_released then
-      on_click model
-    else model
+      on_click input.model
+    else input.model
   in
   let state = reduce state in
-  let state_tree = State_tree.add name (Button state) state_tree in
+  let state_tree = State_tree.add name (Button state) input.state_tree in
 
   (* Draw button. *)
   let button_col = get_col state background_color in
@@ -157,9 +156,17 @@ let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
               ];
           ] )
   in
-  let _, _, state_tree, model =
-    draw_widget parent_x parent_y width height state_tree model view
+  let input =
+    {
+      parent_x = input.parent_x;
+      parent_y = input.parent_y;
+      parent_w = width;
+      parent_h = height;
+      state_tree;
+      model;
+    }
   in
+  let _, _, state_tree, model = draw_widget input view in
   (width, height, state_tree, model)
 
 let size width height _ _ _ = (width, height)

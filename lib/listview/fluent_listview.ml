@@ -1,7 +1,9 @@
-let widget name parent_x parent_y parent_w parent_h state_tree model =
+open Drawable_types
+
+let widget name (input : 'a draw_widget_input) =
   (* Manage state. *)
   let state =
-    match State_tree.find_opt name state_tree with
+    match State_tree.find_opt name input.state_tree with
     | Some (ListView x) -> x
     | _ -> Listview_state.initial
   in
@@ -65,7 +67,8 @@ let widget name parent_x parent_y parent_w parent_h state_tree model =
   let img = Raylib.image_text str 20 Raylib.Color.raywhite in
   let rect =
     Raylib.Rectangle.create (float_of_int start_x) (float_of_int start_y)
-      (float_of_int parent_w) (float_of_int parent_h)
+      (float_of_int input.parent_w)
+      (float_of_int input.parent_h)
   in
   Raylib.image_crop (Raylib.addr img) rect;
   let texture = Raylib.load_texture_from_image img in
@@ -73,7 +76,7 @@ let widget name parent_x parent_y parent_w parent_h state_tree model =
   Raylib.unload_image img;
   let cached_texture = Some texture in
   let state = { state with texture = cached_texture } in
-  let state_tree = State_tree.add name (ListView state) state_tree in
+  let state_tree = State_tree.add name (ListView state) input.state_tree in
   (* Draw texture and then return. *)
-  Raylib.draw_texture texture parent_x parent_y Raylib.Color.red;
-  (parent_w, parent_h, state_tree, model)
+  Raylib.draw_texture texture input.parent_x input.parent_y Raylib.Color.red;
+  (input.parent_w, input.parent_h, state_tree, input.model)

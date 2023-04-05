@@ -387,9 +387,15 @@ let rec draw_widget (input : 'a Drawable_types.draw_widget_input) =
       (w, h, state_tree, model)
 
 let draw model view state_tree =
-  let width = Raylib.get_screen_width () in
-  let height = Raylib.get_screen_height () in
-  let _, _, state_tree, model =
-    draw_widget 0 0 width height state_tree model view
+  let input =
+    {
+      parent_x = 0;
+      parent_y = 0;
+      parent_w = Raylib.get_screen_width ();
+      parent_h = Raylib.get_screen_height ();
+      state_tree;
+      model;
+    }
   in
+  let _, _, state_tree, model = draw_widget input view in
   (state_tree, model)
