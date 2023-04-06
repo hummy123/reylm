@@ -13,9 +13,9 @@ let run_app ?(background_col = Raylib.Color.create 243 243 243 255) window_title
         let open Raylib in
         begin_drawing ();
         clear_background background_col;
-        let state, model = Drawable_drawing.draw model current_view state in
+        let output = Drawable_drawing.draw model current_view state in
         end_drawing ();
-        loop view model state
+        loop view output.model output.state_tree
   in
   Raylib.set_config_flags [ Window_resizable; Vsync_hint ];
   Raylib.init_window 0 0 window_title;

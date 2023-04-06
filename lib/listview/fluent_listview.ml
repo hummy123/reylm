@@ -79,4 +79,9 @@ let widget name (input : 'a draw_widget_input) =
   let state_tree = State_tree.add name (ListView state) input.state_tree in
   (* Draw texture and then return. *)
   Raylib.draw_texture texture input.parent_x input.parent_y Raylib.Color.red;
-  (input.parent_w, input.parent_h, state_tree, input.model)
+  {
+    width = input.parent_w;
+    height = input.parent_h;
+    state_tree;
+    model = input.model;
+  }

@@ -166,7 +166,7 @@ let widget name ?(text = "") ?width ?height ?(on_click = fun x -> x)
       model;
     }
   in
-  let _, _, state_tree, model = draw_widget input view in
-  (width, height, state_tree, model)
+  let output = draw_widget input view in
+  { output with width; height }
 
 let size width height _ _ _ = (width, height)

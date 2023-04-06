@@ -12,9 +12,9 @@ let widget str ?(font_path = Fonts.regular)
   in
   Raylib.draw_text_ex font str pos font_size font_spacing col;
   let size = Raylib.measure_text_ex font str font_size font_spacing in
-  let w = Raylib.Vector2.x size |> int_of_float in
-  let h = Raylib.Vector2.y size |> int_of_float in
-  (w, h, input.state_tree, input.model)
+  let width = Raylib.Vector2.x size |> int_of_float in
+  let height = Raylib.Vector2.y size |> int_of_float in
+  { width; height; state_tree = input.state_tree; model = input.model }
 
 let size str ?(font_path = Fonts.regular) ?(font_size = 22.0)
     ?(font_spacing = 1.6) _ _ _ =
