@@ -2,22 +2,29 @@
    and we just define a type for it so it's extensible and easier to keep track of
    due to fields being named. *)
 type 'a draw_widget_input = {
-  parent_x : int; (* The x coordinate this drawable should start drawing at. *)
-  parent_y : int; (* The y coordinate this drawable should start drawing at. *)
+  (* The x coordinate this drawable should start drawing at. *)
+  parent_x : int;
+  (* The y coordinate this drawable should start drawing at. *)
+  parent_y : int;
+  (* The total width of this drawable's parent. This drawable should not go beyond this width. *)
   parent_w : int;
-      (* The total width of this drawable's parent. This drawable should not go beyond this width. *)
+  (* The total height of this drawable's parent. This drawable should not go beyond this height. *)
   parent_h : int;
-      (* The total height of this drawable's parent. This drawable should not go beyond this height. *)
+  (* State tree, passing state of controls such as animations through main loop. *)
   state_tree : State_tree.state_tree;
-      (* State tree, passing state of controls such as animations through main loop. *)
-  model : 'a; (* The user's domain model. *)
+  (* The user's domain model. *)
+  model : 'a;
 }
 
 (* The data returned by each drawable. *)
 type 'a draw_widget_output = {
+  (* The width of the control that returns this record. *)
   width : int;
+  (* The height of the control that returns this record. *)
   height : int;
+  (* State tree, passing state of controls such as animations through main loop. *)
   state_tree : State_tree.state_tree;
+  (* The user's domain model. *)
   model : 'a;
 }
 
@@ -53,6 +60,6 @@ type 'a drawable =
   | Padding of left * top * right * bottom * 'a drawable
   | Border of radius * Raylib.Color.t * thickness * 'a drawable
   | Other of
-      ('a draw_widget_input -> int * int * State_tree.state_tree * 'a)
+      ('a draw_widget_input -> 'a draw_widget_output)
       * (int -> int -> 'a drawable -> int * int)
       * 'a drawable
