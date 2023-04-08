@@ -1,44 +1,34 @@
-module Drawable_types = Drawable_types
-module Drawable_sizes = Drawable_sizes
-module Drawable_drawing = Drawable_drawing
-module Fluent = Fluent
-open Drawable_types
+module Drawable = Drawable
+open Drawable
 
-let run_app ?(background_col = Raylib.Color.create 243 243 243 255) window_title
-    view initial_model =
-  let rec loop view (input : 'a draw_widget_input) =
+let default_bg = Raylib.Color.create 243 243 243 255
+let default_title = "default_title"
+
+let run_app ?(background_col = default_bg) ?(window_title = default_title) view
+    =
+  let rec loop view =
     match Raylib.window_should_close () with
-    | true -> Raylib.close_window ()
+    | true ->
+        if Raylib.is_key_pressed Raylib.Key.Escape then loop view
+        else Raylib.close_window ()
     | false ->
-        let current_view = view input.model in
         let open Raylib in
-        begin_drawing ();
-        clear_background background_col;
-        let output = Drawable_drawing.draw current_view input in
-        end_drawing ();
-        let input =
+        let constraints_from_root =
           {
-            parent_x = 0;
-            parent_y = 0;
-            parent_w = Raylib.get_screen_width ();
-            parent_h = Raylib.get_screen_height ();
-            state_tree = output.state_tree;
-            model = output.model;
+            start_x = 0;
+            start_y = 0;
+            min_width = 0;
+            min_height = 0;
+            max_width = Raylib.get_screen_width ();
+            max_height = Raylib.get_screen_height ();
           }
         in
-        loop view input
+        begin_drawing ();
+        clear_background background_col;
+        let _ = Drawable.draw constraints_from_root view in
+        end_drawing ();
+        loop view
   in
-  Raylib.set_config_flags [ Window_resizable; Vsync_hint ];
+  Raylib.set_config_flags [ Window_maximized; Window_resizable; Vsync_hint ];
   Raylib.init_window 0 0 window_title;
-  Raylib.maximize_window ();
-  let input =
-    {
-      parent_x = 0;
-      parent_y = 0;
-      parent_w = Raylib.get_screen_width ();
-      parent_h = Raylib.get_screen_height ();
-      state_tree = State_tree.SE;
-      model = initial_model;
-    }
-  in
-  loop view input
+  loop view
