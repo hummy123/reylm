@@ -15,8 +15,8 @@ let get_child_constraints l t r b constraints =
   }
 
 let size l t r b child constraints =
-  let constraints = get_child_constraints l t r b constraints in
-  let { width; height } = Drawable.size constraints child in
+  let child_constraints = get_child_constraints l t r b constraints in
+  let { width; height } = Drawable.size child_constraints child in
   { width = width + l + r; height = height + t + b }
 
 let draw l t r b child constraints =
