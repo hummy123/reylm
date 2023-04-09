@@ -1,6 +1,6 @@
 open Reyml
 open Reyml.Drawable
-open Raylib
+open Reyml.Rect
 
-let view = Rect (500, 500, 0.5, Color.black)
+let view = Rect.widget ~width:10 ~height:10 ()
 let () = run_app view
