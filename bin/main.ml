@@ -1,4 +1,4 @@
 open Reyml
 
-let view = Padding.widget ~left:10 ~top:30 (Rect.widget ~width:60 ~height:30 ())
+let view = Align.widget ~x_shift:0.1 (Rect.widget ~width:60 ~height:30 ())
 let () = run_app view
