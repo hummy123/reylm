@@ -1,5 +1,3 @@
-open Raylib
-
 type input_constraints = {
   (* The x coordinate this drawable should start drawing at. *)
   start_x : int;
@@ -13,9 +11,20 @@ type input_constraints = {
   min_height : int;
 }
 
-type drawn_size = { width : int; height : int }
-type drawable = Empty | Widget of (input_constraints -> drawn_size)
+type drawable_size = { width : int; height : int }
+
+type drawable =
+  | Empty
+  | Widget of
+      (input_constraints -> drawable_size)
+      * (input_constraints -> drawable_size)
+
+let empty_size = { width = 0; height = 0 }
+
+let size contraints = function
+  | Empty -> empty_size
+  | Widget (_, f_size) -> f_size contraints
 
 let draw constraints = function
-  | Empty -> { width = 0; height = 0 }
-  | Widget f_draw -> f_draw constraints
+  | Empty -> empty_size
+  | Widget (f_draw, _) -> f_draw constraints

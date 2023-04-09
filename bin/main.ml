@@ -1,6 +1,4 @@
 open Reyml
-open Reyml.Drawable
-open Reyml.Rect
 
-let view = Rect.widget ~width:10 ~height:10 ()
+let view = Padding.widget ~left:10 ~top:30 (Rect.widget ~width:60 ~height:30 ())
 let () = run_app view
