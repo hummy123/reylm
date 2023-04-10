@@ -1,3 +1,4 @@
+open Raylib
 open Drawable
 
 let default_bg = Raylib.Color.create 243 243 243 255
@@ -11,7 +12,6 @@ let run_app ?(background_col = default_bg) ?(window_title = default_title) view
         if Raylib.is_key_pressed Raylib.Key.Escape then loop view
         else Raylib.close_window ()
     | false ->
-        let open Raylib in
         let constraints_from_root =
           {
             start_x = 0;
@@ -29,5 +29,7 @@ let run_app ?(background_col = default_bg) ?(window_title = default_title) view
         loop view
   in
   Raylib.set_config_flags [ Window_maximized; Window_resizable; Vsync_hint ];
-  Raylib.init_window 0 0 window_title;
+  let width = 1600 in
+  let height = 900 in
+  Raylib.init_window width height window_title;
   loop view
