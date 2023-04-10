@@ -23,16 +23,14 @@ type drawable =
 
 let empty_size = { width = 0; height = 0 }
 
-let rec size constraints = function
+let size constraints = function
   | Empty -> empty_size
   | Widget (_, f_size) -> f_size constraints
-  (* Reminder: We should never call Drawable.size on a Row/Column or any Widget that accepts multiple children
-     before checking total flex of all children. *)
-  | Flex (_, fit, child) -> (
-      match fit with
-      | ForceFill ->
-          { width = constraints.max_width; height = constraints.max_height }
-      | NoForce -> size constraints child)
+  (* Whether flex is forced to fill or not, return the maximum size.
+     This is obvious for when child is forced to fill constraints,
+     and when child is not forced to fill, it means there is empty space around the child.
+  *)
+  | Flex _ -> { width = constraints.max_width; height = constraints.max_height }
 
 let rec draw constraints = function
   | Empty -> empty_size
@@ -43,9 +41,11 @@ let rec draw constraints = function
           let constraints =
             {
               constraints with
-              min_width = constraints.max_height;
+              min_width = constraints.max_width;
               min_height = constraints.max_height;
             }
           in
           draw constraints child
-      | NoForce -> draw constraints child)
+      | NoForce ->
+          let _ = draw constraints child in
+          { width = constraints.max_width; height = constraints.max_height })

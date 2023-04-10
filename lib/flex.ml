@@ -8,5 +8,8 @@ let draw flex_val fit child constraints =
   let flex = Flex (flex_val, fit, child) in
   Drawable.draw constraints flex
 
-let widget ?(flex_val = 1) ?(fit = ForceFill) child =
-  Widget (draw flex_val fit child, size flex_val fit child)
+let force_fill ?(flex_val = 1) child =
+  Widget (draw flex_val ForceFill child, size flex_val ForceFill child)
+
+let no_force ?(flex_val = 1) child =
+  Widget (draw flex_val NoForce child, size flex_val NoForce child)
