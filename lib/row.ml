@@ -32,7 +32,9 @@ let min_size children constraints =
   let width, height, has_flex =
     Array.fold_left
       (fun (acc_w, max_h, has_flex) el ->
-        let child_is_flex = match el with Flex _ -> true | _ -> false in
+        let child_is_flex =
+          match el with Flex (_, (Expand | FillWidth), _) -> true | _ -> false
+        in
         let size = Drawable.size constraints el in
         let has_flex = child_is_flex || has_flex in
         (acc_w + size.width, max max_h size.height, has_flex))
@@ -43,6 +45,9 @@ let min_size children constraints =
 
 let min_draw children constraints =
   let flex_data = calc_flex_data children constraints in
+  let constraints =
+    { constraints with max_height = flex_data.max_child_height }
+  in
   if flex_data.num_flex_width_children > 0 then
     flex_draw flex_data children constraints
   else
@@ -70,6 +75,9 @@ let max_size children constraints =
 
 let start_draw children constraints =
   let flex_data = calc_flex_data children constraints in
+  let constraints =
+    { constraints with max_height = flex_data.max_child_height }
+  in
   if flex_data.num_flex_width_children > 0 then
     flex_draw flex_data children constraints
   else

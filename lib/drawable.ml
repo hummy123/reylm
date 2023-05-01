@@ -32,6 +32,8 @@ type flex_data = {
   occupied_non_flex_width : int;
   num_flex_width_children : int;
   num_flex_height_children : int;
+  max_child_height : int;
+  max_child_width : int;
 }
 
 let initial_flex_data =
@@ -42,6 +44,8 @@ let initial_flex_data =
     num_flex_width_children = 0;
     occupied_non_flex_height = 0;
     occupied_non_flex_width = 0;
+    max_child_height = 0;
+    max_child_width = 0;
   }
 
 let rec size constraints = function
