@@ -4,14 +4,13 @@ open Drawable
 let default_bg = Raylib.Color.create 243 243 243 255
 let default_title = "default_title"
 
-let run_app ?(background_col = default_bg) ?(window_title = default_title) view
-    =
+let run_app ?(window_title = default_title) view =
   let rec loop view =
-    match Raylib.window_should_close () with
-    | true ->
-        if Raylib.is_key_pressed Raylib.Key.Escape then loop view
-        else Raylib.close_window ()
-    | false ->
+    match
+      (Raylib.window_should_close (), Raylib.is_key_pressed Raylib.Key.Escape)
+    with
+    | true, false -> Raylib.close_window ()
+    | _ ->
         let constraints_from_root =
           {
             start_x = 0;
@@ -23,7 +22,7 @@ let run_app ?(background_col = default_bg) ?(window_title = default_title) view
           }
         in
         begin_drawing ();
-        clear_background background_col;
+        clear_background default_bg;
         let _ = Drawable.draw constraints_from_root view in
         end_drawing ();
         loop view

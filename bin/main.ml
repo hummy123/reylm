@@ -1,7 +1,7 @@
 open Reyml
 
 let view =
-  Row.min
+  Row.min ~collapse_height:false
     [|
       Flex.fill_width ~flex_val:5 (Rect.widget ~width:80 ~height:850 ());
       Rect.widget ~width:300 ~height:200 ~color:Raylib.Color.red ();

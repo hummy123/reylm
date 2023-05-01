@@ -43,10 +43,12 @@ let min_size children constraints =
   if has_flex then { width = constraints.max_width; height }
   else { width; height }
 
-let min_draw children constraints =
+let min_draw collapse_height children constraints =
   let flex_data = calc_flex_data children constraints in
   let constraints =
-    { constraints with max_height = flex_data.max_child_height }
+    if collapse_height then
+      { constraints with max_height = flex_data.max_child_height }
+    else constraints
   in
   if flex_data.num_flex_width_children > 0 then
     flex_draw flex_data children constraints
@@ -64,9 +66,11 @@ let min_draw children constraints =
         (constraints.start_x, 0, 0)
         children
     in
+    let height = if collapse_height then height else constraints.min_height in
     { width; height }
 
-let min children = Widget (min_draw children, min_size children)
+let min ?(collapse_height = true) children =
+  Widget (min_draw collapse_height children, min_size children)
 
 (* Functions for drawing row at maximum size according to different directions. *)
 let max_size children constraints =
