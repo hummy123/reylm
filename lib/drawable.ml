@@ -12,6 +12,9 @@ type input_constraints = {
 }
 
 type drawable_size = { width : int; height : int }
+
+let empty_size = { width = 0; height = 0 }
+
 type flex_fit = Expand | NaturalSize | FillHeight | FillWidth
 
 type drawable =
@@ -21,14 +24,26 @@ type drawable =
       (input_constraints -> drawable_size)
       * (input_constraints -> drawable_size)
 
-let empty_size = { width = 0; height = 0 }
+(* Row/column preprocessing data for calculating flex values. *)
+type flex_data = {
+  total_flex : int;
+  occupied_space_without_flex_children : int;
+  num_flex_children : int;
+}
+
+let initial_flex_data =
+  {
+    total_flex = 0;
+    occupied_space_without_flex_children = 0;
+    num_flex_children = 0;
+  }
 
 let size constraints = function
   | Empty -> empty_size
   | Widget (_, f_size) -> f_size constraints
   (* Whether flex is forced to fill or not, return the maximum size.
-     This is obvious for when child is forced to fill constraints,
-     and when child is not forced to fill, it means there is empty space around the child.
+     This is obvious for when child is forced to fill constraints.
+     When child is not forced to fill, it means there is empty space around the child.
      This matches Flutter's behaviour; see 0:55 here: https://www.youtube.com/watch?v=CI7x0mAZiY0 .
   *)
   | Flex _ -> { width = constraints.max_width; height = constraints.max_height }
