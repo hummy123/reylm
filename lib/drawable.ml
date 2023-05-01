@@ -26,16 +26,22 @@ type drawable =
 
 (* Row/column preprocessing data for calculating flex values. *)
 type flex_data = {
-  total_flex : int;
-  occupied_space_without_flex_children : int;
-  num_flex_children : int;
+  total_flex_height : int;
+  total_flex_width : int;
+  occupied_non_flex_height : int;
+  occupied_non_flex_width : int;
+  num_flex_width_children : int;
+  num_flex_height_children : int;
 }
 
 let initial_flex_data =
   {
-    total_flex = 0;
-    occupied_space_without_flex_children = 0;
-    num_flex_children = 0;
+    total_flex_height = 0;
+    total_flex_width = 0;
+    occupied_non_flex_height = 0;
+    occupied_non_flex_width = 0;
+    num_flex_height_children = 0;
+    num_flex_width_children = 0;
   }
 
 let size constraints = function
