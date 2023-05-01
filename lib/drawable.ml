@@ -38,10 +38,10 @@ let initial_flex_data =
   {
     total_flex_height = 0;
     total_flex_width = 0;
-    occupied_non_flex_height = 0;
-    occupied_non_flex_width = 0;
     num_flex_height_children = 0;
     num_flex_width_children = 0;
+    occupied_non_flex_height = 0;
+    occupied_non_flex_width = 0;
   }
 
 let size constraints = function
@@ -68,7 +68,7 @@ let rec draw constraints = function
             }
         | FillHeight -> { constraints with min_height = constraints.max_height }
         | FillWidth -> { constraints with min_width = constraints.max_width }
-        | NaturalSize -> constraints
+        | NaturalSize -> { constraints with min_width = 0; min_height = 0 }
       in
       let _ = draw child_constraints child in
       { width = constraints.max_width; height = constraints.max_height }

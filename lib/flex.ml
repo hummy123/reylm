@@ -9,14 +9,37 @@ let calc_flex_data children constraints =
   Array.fold_left
     (fun flex_data el ->
       match el with
-      | Flex (flex_value, FillWidth, _) ->
-          let total_flex = flex_data.total_flex + flex_value in
-          let num_flex_children = flex_data.num_flex_children + 1 in
-          { flex_data with total_flex; num_flex_children }
-      | _ ->
-          let { width; _ } = Drawable.size constraints el in
-          let occupied_space_without_flex_children =
-            flex_data.occupied_space_without_flex_children + width
+      | Flex (flex_value, Expand, _) ->
+          let total_flex_height = flex_data.total_flex_height + flex_value in
+          let total_flex_width = flex_data.total_flex_width + flex_value in
+          let num_flex_width_children = flex_data.num_flex_width_children + 1 in
+          let num_flex_height_children =
+            flex_data.num_flex_height_children + 1
           in
-          { flex_data with occupied_space_without_flex_children })
+          {
+            flex_data with
+            total_flex_width;
+            total_flex_height;
+            num_flex_height_children;
+            num_flex_width_children;
+          }
+      | Flex (flex_value, FillWidth, _) ->
+          let total_flex_width = flex_data.total_flex_width + flex_value in
+          let num_flex_width_children = flex_data.num_flex_width_children + 1 in
+          { flex_data with total_flex_width; num_flex_width_children }
+      | Flex (flex_value, FillHeight, _) ->
+          let total_flex_height = flex_data.total_flex_height + flex_value in
+          let num_flex_height_children =
+            flex_data.num_flex_height_children + 1
+          in
+          { flex_data with total_flex_height; num_flex_height_children }
+      | _ ->
+          let { width; height } = Drawable.size constraints el in
+          let occupied_non_flex_width =
+            flex_data.occupied_non_flex_width + width
+          in
+          let occupied_non_flex_height =
+            flex_data.occupied_non_flex_height + height
+          in
+          { flex_data with occupied_non_flex_width; occupied_non_flex_height })
     initial_flex_data children
