@@ -44,7 +44,7 @@ let initial_flex_data =
     occupied_non_flex_width = 0;
   }
 
-let size constraints = function
+let rec size constraints = function
   | Empty -> empty_size
   | Widget (_, f_size) -> f_size constraints
   (* Whether flex is forced to fill or not, return the maximum size.
@@ -52,7 +52,20 @@ let size constraints = function
      When child is not forced to fill, it means there is empty space around the child.
      This matches Flutter's behaviour; see 0:55 here: https://www.youtube.com/watch?v=CI7x0mAZiY0 .
   *)
-  | Flex _ -> { width = constraints.max_width; height = constraints.max_height }
+  | Flex (_, fit, child) ->
+      let child_constraints =
+        match fit with
+        | Expand ->
+            {
+              constraints with
+              min_width = constraints.max_width;
+              min_height = constraints.max_height;
+            }
+        | FillHeight -> { constraints with min_height = constraints.max_height }
+        | FillWidth -> { constraints with min_width = constraints.max_width }
+        | NaturalSize -> { constraints with min_width = 0; min_height = 0 }
+      in
+      size child_constraints child
 
 let rec draw constraints = function
   | Empty -> empty_size
