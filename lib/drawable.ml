@@ -70,5 +70,4 @@ let rec draw constraints = function
         | FillWidth -> { constraints with min_width = constraints.max_width }
         | NaturalSize -> { constraints with min_width = 0; min_height = 0 }
       in
-      let _ = draw child_constraints child in
-      { width = constraints.max_width; height = constraints.max_height }
+      draw child_constraints child
