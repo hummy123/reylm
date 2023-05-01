@@ -17,6 +17,10 @@ let min_draw children constraints =
     Array.fold_left
       (fun (start_x, acc_w, max_h) el ->
         let constraints = { constraints with start_x } in
+        (* We want to ignore flex for this case,
+            so if one of the children is wrapped in flex,
+           then get the flex's child instead. *)
+        let el = match el with Flex (_, _, el) -> el | el -> el in
         let size = Drawable.draw constraints el in
         (* Values for next iteration. *)
         let start_x = start_x + size.width in
