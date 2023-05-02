@@ -19,15 +19,15 @@ type flex_fit = Expand | NaturalSize | FillHeight | FillWidth
 
 type drawable =
   | Empty
-  | Flex of int * flex_fit * drawable
+  | Flex of float * flex_fit * drawable
   | Widget of
       (input_constraints -> drawable_size)
       * (input_constraints -> drawable_size)
 
 (* Row/column preprocessing data for calculating flex values. *)
 type flex_data = {
-  total_flex_height : int;
-  total_flex_width : int;
+  total_flex_height : float;
+  total_flex_width : float;
   occupied_non_flex_height : int;
   occupied_non_flex_width : int;
   num_flex_width_children : int;
@@ -38,8 +38,8 @@ type flex_data = {
 
 let initial_flex_data =
   {
-    total_flex_height = 0;
-    total_flex_width = 0;
+    total_flex_height = 0.;
+    total_flex_width = 0.;
     num_flex_height_children = 0;
     num_flex_width_children = 0;
     occupied_non_flex_height = 0;

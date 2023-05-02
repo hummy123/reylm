@@ -5,14 +5,14 @@ let flex_draw flex_data children constraints =
   let remaining_space =
     float_of_int (constraints.max_width - flex_data.occupied_non_flex_width)
   in
-  let total_flex = float_of_int flex_data.total_flex_width in
+  let total_flex = flex_data.total_flex_width in
   let _, height =
     Array.fold_left
       (fun (start_x, max_h) el ->
         let constraints =
           match el with
           | Flex (flex_value, (FillWidth | Expand), _) ->
-              let flex_value = float_of_int flex_value in
+              let flex_value = flex_value in
               let flex_percent = flex_value /. total_flex in
               let width = remaining_space *. flex_percent |> int_of_float in
               { constraints with max_width = width; start_x }
