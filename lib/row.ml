@@ -1,14 +1,14 @@
 open Drawable
 open Flex
 
-let flex_draw flex_data children constraints =
+let flex_draw flex_data height children constraints =
   let remaining_space =
     float_of_int (constraints.max_width - flex_data.occupied_non_flex_width)
   in
   let total_flex = flex_data.total_flex_width in
-  let _, height =
+  let _ =
     Array.fold_left
-      (fun (start_x, max_h) el ->
+      (fun start_x el ->
         let constraints =
           match el with
           | Flex (flex_value, (FillWidth | Expand), _) ->
@@ -20,9 +20,8 @@ let flex_draw flex_data children constraints =
         in
         let size = Drawable.draw constraints el in
         let start_x = start_x + size.width in
-        let max_h = max max_h size.height in
-        (start_x, max_h))
-      (constraints.start_x, 0) children
+        start_x)
+      constraints.start_x children
   in
   { width = constraints.max_width; height }
 
@@ -52,7 +51,7 @@ let min_draw collapse_height children constraints =
     else constraints
   in
   if flex_data.num_flex_width_children > 0 then
-    flex_draw flex_data children constraints
+    flex_draw flex_data constraints.max_height children constraints
   else
     let _, width, height =
       Array.fold_left
@@ -70,7 +69,7 @@ let min_draw collapse_height children constraints =
     let height = if collapse_height then height else constraints.min_height in
     { width; height }
 
-let min ?(collapse_height = true) children =
+let min ?(collapse_height = false) children =
   Widget (min_draw collapse_height children, min_size collapse_height children)
 
 (* Functions for drawing row at maximum size according to different directions. *)
@@ -90,13 +89,8 @@ let directional_draw calc_start_x collapse_height children constraints =
     else constraints
   in
   if flex_data.num_flex_width_children > 0 then
-    flex_draw flex_data children constraints
+    flex_draw flex_data constraints.max_height children constraints
   else
-    (* Return appropriate height depending on whether we want to collapse or not. *)
-    let height =
-      if collapse_height then flex_data.max_child_height
-      else constraints.min_height
-    in
     let start_x = constraints.start_x + calc_start_x constraints flex_data in
     let _ =
       Array.fold_left
@@ -108,7 +102,7 @@ let directional_draw calc_start_x collapse_height children constraints =
           start_x)
         start_x children
     in
-    { width = constraints.max_width; height }
+    { width = constraints.max_width; height = constraints.max_height }
 
 (* Fuctions for drawing row aligned to left. *)
 let calc_start_x_left _ _ = 0
@@ -135,3 +129,52 @@ let right ?(collapse_height = false) children =
   Widget
     ( directional_draw calc_start_x_right collapse_height children,
       max_size collapse_height children )
+
+(* Functions for drawing row with space in between/around. *)
+let spacer = Spacer.horizontal ()
+
+let draw_space_between collapse_height children constraints =
+  let flex_data = calc_flex_data children constraints in
+  let constraints =
+    if collapse_height then
+      { constraints with max_height = flex_data.max_child_height }
+    else constraints
+  in
+  if flex_data.num_flex_width_children > 0 then
+    flex_draw flex_data constraints.max_height children constraints
+  else
+    (* We will insert a spacer in between each child. *)
+    let children =
+      Array.fold_right (fun el acc -> spacer :: el :: acc) children []
+    in
+    let children =
+      match children with _ :: tail -> tail |> Array.of_list | _ -> [||]
+    in
+    let flex_data = calc_flex_data children constraints in
+    flex_draw flex_data constraints.max_height children constraints
+
+let space_between ?(collapse_height = false) childre =
+  Widget
+    ( draw_space_between collapse_height childre,
+      max_size collapse_height childre )
+
+let draw_space_around collapse_height children constraints =
+  let flex_data = calc_flex_data children constraints in
+  let constraints =
+    if collapse_height then
+      { constraints with max_height = flex_data.max_child_height }
+    else constraints
+  in
+  if flex_data.num_flex_width_children > 0 then
+    flex_draw flex_data constraints.max_height children constraints
+  else
+    let children =
+      Array.fold_right (fun el acc -> spacer :: el :: acc) children [ spacer ]
+      |> Array.of_list
+    in
+    let flex_data = calc_flex_data children constraints in
+    flex_draw flex_data constraints.max_height children constraints
+
+let space_around ?(collapse_height = false) childre =
+  Widget
+    (draw_space_around collapse_height childre, max_size collapse_height childre)
