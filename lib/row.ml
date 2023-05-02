@@ -78,39 +78,11 @@ let max_size collapse_height children constraints =
   let { height; _ } = min_size collapse_height children constraints in
   { width = constraints.max_width; height }
 
-let left_draw collapse_height children constraints =
-  let flex_data = calc_flex_data children constraints in
-  (* If collapse_height is true, then the height constraint is limited by the largest non-flex child's height;
-     otherwise, it is limited by the existing constraint's height which means it is unchanged. *)
-  let constraints =
-    if collapse_height then
-      { constraints with max_height = flex_data.max_child_height }
-    else constraints
-  in
-  if flex_data.num_flex_width_children > 0 then
-    flex_draw flex_data children constraints
-  else
-    (* Return appropriate height depending on whether we want to collapse or not. *)
-    let height =
-      if collapse_height then flex_data.max_child_height
-      else constraints.min_height
-    in
-    let _ =
-      Array.fold_left
-        (fun start_x el ->
-          let constraints = { constraints with start_x } in
-          let size = Drawable.draw constraints el in
-          (* Values for next iteration. *)
-          let start_x = start_x + size.width in
-          start_x)
-        constraints.start_x children
-    in
-    { width = constraints.max_width; height }
-
-let left ?(collapse_height = false) children =
-  Widget (left_draw collapse_height children, max_size collapse_height children)
-
-let center_draw collapse_height children constraints =
+(*
+    Generic function for aligning to a direction (left, center, right).
+    calc_start_x function is the only thing changing for this, specifying x coordinate to start drawing from.
+*)
+let directional_draw calc_start_x collapse_height children constraints =
   let flex_data = calc_flex_data children constraints in
   let constraints =
     if collapse_height then
@@ -125,10 +97,7 @@ let center_draw collapse_height children constraints =
       if collapse_height then flex_data.max_child_height
       else constraints.min_height
     in
-    let start_x =
-      constraints.start_x
-      + ((constraints.max_width / 2) - (flex_data.occupied_non_flex_width / 2))
-    in
+    let start_x = constraints.start_x + calc_start_x constraints flex_data in
     let _ =
       Array.fold_left
         (fun start_x el ->
@@ -141,6 +110,28 @@ let center_draw collapse_height children constraints =
     in
     { width = constraints.max_width; height }
 
+(* Fuctions for drawing row aligned to left. *)
+let calc_start_x_left _ _ = 0
+
+let left ?(collapse_height = false) children =
+  Widget
+    ( directional_draw calc_start_x_left collapse_height children,
+      max_size collapse_height children )
+
+(* Functions for drawing row aligned to center. *)
+let calc_start_x_center constraints flex_data =
+  (constraints.max_width / 2) - (flex_data.occupied_non_flex_width / 2)
+
 let center ?(collapse_height = false) children =
   Widget
-    (center_draw collapse_height children, max_size collapse_height children)
+    ( directional_draw calc_start_x_center collapse_height children,
+      max_size collapse_height children )
+
+(* Functions for drawing row aligned to right. *)
+let calc_start_x_right constraints flex_data =
+  constraints.max_width - flex_data.occupied_non_flex_width
+
+let right ?(collapse_height = false) children =
+  Widget
+    ( directional_draw calc_start_x_right collapse_height children,
+      max_size collapse_height children )
