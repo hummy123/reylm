@@ -28,11 +28,15 @@ let calc_flex_data children constraints =
           let num_flex_width_children = flex_data.num_flex_width_children + 1 in
           let { height; _ } = Drawable.size constraints el in
           let max_child_height = max height flex_data.max_child_height in
+          let occupied_non_flex_height =
+            flex_data.occupied_non_flex_height + height
+          in
           {
             flex_data with
             total_flex_width;
             num_flex_width_children;
             max_child_height;
+            occupied_non_flex_height;
           }
       | Flex (flex_value, FillHeight, _) ->
           let total_flex_height = flex_data.total_flex_height + flex_value in
@@ -41,11 +45,15 @@ let calc_flex_data children constraints =
           in
           let { width; _ } = Drawable.size constraints el in
           let max_child_width = max width flex_data.max_child_width in
+          let occupied_non_flex_width =
+            flex_data.occupied_non_flex_width + width
+          in
           {
             flex_data with
             total_flex_height;
             num_flex_height_children;
             max_child_width;
+            occupied_non_flex_width;
           }
       | _ ->
           let { width; height } = Drawable.size constraints el in
