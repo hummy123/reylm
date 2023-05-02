@@ -95,20 +95,21 @@ let flex_draw_if_flex_children collapse_height children constraints f_not_flex =
     calc_start_x function is the only thing changing for this, specifying x coordinate to start drawing from.
 *)
 let directional_draw calc_start_x collapse_height children constraints =
-  flex_draw_if_flex_children collapse_height children constraints
-    (fun flex_data constraints ->
-      let start_x = constraints.start_x + calc_start_x constraints flex_data in
-      let _ =
-        Array.fold_left
-          (fun start_x el ->
-            let constraints = { constraints with start_x } in
-            let size = Drawable.draw constraints el in
-            (* Values for next iteration. *)
-            let start_x = start_x + size.width in
-            start_x)
-          start_x children
-      in
-      { width = constraints.max_width; height = constraints.max_height })
+  let if_not_flex flex_data constraints =
+    let start_x = constraints.start_x + calc_start_x constraints flex_data in
+    let _ =
+      Array.fold_left
+        (fun start_x el ->
+          let constraints = { constraints with start_x } in
+          let size = Drawable.draw constraints el in
+          (* Values for next iteration. *)
+          let start_x = start_x + size.width in
+          start_x)
+        start_x children
+    in
+    { width = constraints.max_width; height = constraints.max_height }
+  in
+  flex_draw_if_flex_children collapse_height children constraints if_not_flex
 
 (* Fuctions for drawing row aligned to left. *)
 let calc_start_x_left _ _ = 0
@@ -141,18 +142,19 @@ let spacer = Spacer.horizontal ()
 let double_spacer = Spacer.horizontal ~flex_val:2. ()
 
 let draw_space_between collapse_height children constraints =
-  flex_draw_if_flex_children collapse_height children constraints
-    (fun _ constraints ->
-      (* We will insert a spacer in between each child. *)
-      let children =
-        Array.fold_right (fun el acc -> spacer :: el :: acc) children []
-      in
-      (* Remove first spacer from list. *)
-      let children =
-        match children with _ :: tail -> tail |> Array.of_list | _ -> [||]
-      in
-      let flex_data = calc_flex_data children constraints in
-      flex_draw flex_data constraints.max_height children constraints)
+  let if_not_flex _ constraints =
+    (* We will insert a spacer in between each child. *)
+    let children =
+      Array.fold_right (fun el acc -> spacer :: el :: acc) children []
+    in
+    (* Remove first spacer from list. *)
+    let children =
+      match children with _ :: tail -> tail |> Array.of_list | _ -> [||]
+    in
+    let flex_data = calc_flex_data children constraints in
+    flex_draw flex_data constraints.max_height children constraints
+  in
+  flex_draw_if_flex_children collapse_height children constraints if_not_flex
 
 let space_between ?(collapse_height = false) children =
   Widget
@@ -160,17 +162,18 @@ let space_between ?(collapse_height = false) children =
       max_size collapse_height children )
 
 let draw_space_around collapse_height children constraints =
-  flex_draw_if_flex_children collapse_height children constraints
-    (fun _ constraints ->
-      let children =
-        Array.fold_right
-          (fun el acc -> double_spacer :: el :: acc)
-          children [ spacer ]
-        |> Array.of_list
-      in
-      Array.unsafe_set children 0 spacer;
-      let flex_data = calc_flex_data children constraints in
-      flex_draw flex_data constraints.max_height children constraints)
+  let if_not_flex _ constraints =
+    let children =
+      Array.fold_right
+        (fun el acc -> double_spacer :: el :: acc)
+        children [ spacer ]
+      |> Array.of_list
+    in
+    Array.unsafe_set children 0 spacer;
+    let flex_data = calc_flex_data children constraints in
+    flex_draw flex_data constraints.max_height children constraints
+  in
+  flex_draw_if_flex_children collapse_height children constraints if_not_flex
 
 let space_around ?(collapse_height = false) children =
   Widget
