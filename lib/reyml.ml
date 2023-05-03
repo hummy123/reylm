@@ -4,6 +4,7 @@ module Padding = Padding
 module Center = Center
 module Align = Align
 module Flex = Flex
+module Column = Column
 module Row = Row
 module Spacer = Spacer
 
