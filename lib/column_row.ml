@@ -3,6 +3,7 @@
 *)
 
 open Drawable
+open Flex
 
 (* This type tells us which axis to draw along. *)
 type caller = Row | Column
@@ -54,7 +55,7 @@ let flex_draw caller flex_data children constraints =
               set_flex_child_constraints constraints el_size start_pos caller
           | _ -> set_non_flex_constraints constraints start_pos caller
         in
-        let size = Drawable.size constraints el in
+        let size = Drawable.draw constraints el in
         let start_pos = increment_start_pos start_pos size caller in
         start_pos)
       start_pos children
