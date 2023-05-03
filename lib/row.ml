@@ -1,30 +1,6 @@
 open Drawable
 open Flex
-
-let flex_draw flex_data height children constraints =
-  let remaining_space =
-    float_of_int (constraints.max_width - flex_data.occupied_non_flex_width)
-  in
-  let total_flex = flex_data.total_flex_width in
-  let _ =
-    Array.fold_left
-      (fun start_x el ->
-        let constraints =
-          match el with
-          | Flex (flex_value, (FillWidth | Expand), _) ->
-              let flex_percent = flex_value /. total_flex in
-              let width =
-                remaining_space *. flex_percent |> Float.round |> int_of_float
-              in
-              { constraints with max_width = width; start_x }
-          | _ -> { constraints with start_x }
-        in
-        let size = Drawable.draw constraints el in
-        let start_x = start_x + size.width in
-        start_x)
-      constraints.start_x children
-  in
-  { width = constraints.max_width; height }
+open Column_row
 
 (* Functions for drawing row at minimum size required by children,
    not expanding as with normal behaviour. *)
@@ -54,7 +30,7 @@ let min_draw collapse_height children constraints =
     else constraints
   in
   if flex_data.num_flex_width_children > 0 then
-    flex_draw flex_data constraints.max_height children constraints
+    flex_draw Row flex_data children constraints
   else
     let _, width, height =
       Array.fold_left
@@ -90,7 +66,7 @@ let flex_draw_if_flex_children collapse_height children constraints f_not_flex =
     else constraints
   in
   if flex_data.num_flex_width_children > 0 then
-    flex_draw flex_data constraints.max_height children constraints
+    flex_draw Row flex_data children constraints
   else f_not_flex flex_data constraints
 
 (*
@@ -155,7 +131,7 @@ let draw_space_between collapse_height children constraints =
       match children with _ :: tail -> tail |> Array.of_list | _ -> [||]
     in
     let flex_data = calc_flex_data children constraints in
-    flex_draw flex_data constraints.max_height children constraints
+    flex_draw Row flex_data children constraints
   in
   flex_draw_if_flex_children collapse_height children constraints if_not_flex
 
@@ -174,7 +150,7 @@ let draw_space_around collapse_height children constraints =
     in
     Array.unsafe_set children 0 spacer;
     let flex_data = calc_flex_data children constraints in
-    flex_draw flex_data constraints.max_height children constraints
+    flex_draw Row flex_data children constraints
   in
   flex_draw_if_flex_children collapse_height children constraints if_not_flex
 
