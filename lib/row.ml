@@ -13,7 +13,9 @@ let flex_draw flex_data height children constraints =
           match el with
           | Flex (flex_value, (FillWidth | Expand), _) ->
               let flex_percent = flex_value /. total_flex in
-              let width = remaining_space *. flex_percent |> int_of_float in
+              let width =
+                remaining_space *. flex_percent |> Float.round |> int_of_float
+              in
               { constraints with max_width = width; start_x }
           | _ -> { constraints with start_x }
         in
