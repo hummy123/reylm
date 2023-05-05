@@ -3,7 +3,6 @@
 *)
 
 open Drawable
-open Flex
 
 (* This type tells us which axis to draw along. *)
 type caller = Row | Column
@@ -61,3 +60,20 @@ let flex_draw caller flex_data children constraints =
       start_pos children
   in
   { height = constraints.max_height; width = constraints.max_width }
+
+(*
+    This function collapses constraints on the opposite axis.
+    For a column, this means if constraints are collapsed, then the maximum width
+    (including for FillWidth flex children) is the width of the largest non-flex child.
+
+    For a row, this means if constraints are collapsed, then the maximum height is the height
+    of the largest non-flex child.
+
+    If the constraints aren't collapsed, then the return constraints are left alone.
+*)
+let collapse_constraints caller should_collapse flex_data constraints =
+  if should_collapse then
+    match caller with
+    | Column -> { constraints with max_width = flex_data.max_child_width }
+    | Row -> { constraints with max_height = flex_data.max_child_height }
+  else constraints

@@ -4,51 +4,41 @@ open Column_row
 
 (* Functions for drawing row at minimum size required by children,
    not expanding as with normal behaviour. *)
-let min_size collapse_width children constraints =
-  let height, width, has_flex =
-    Array.fold_left
-      (fun (acc_h, max_w, has_flex) el ->
-        let child_is_flex =
-          match el with
-          | Flex (_, (Expand | FillHeight), _) -> true
-          | _ -> false
-        in
-        let size = Drawable.size constraints el in
-        let has_flex = child_is_flex || has_flex in
-        let acc_h = acc_h + size.height in
-        let max_w = max max_w size.width in
-        (acc_h, max_w, has_flex))
-      (0, 0, false) children
+let min_size_internal flex_data constraints =
+  let width =
+    if flex_data.num_flex_width_children > 0 then constraints.max_width
+    else flex_data.occupied_non_flex_width
   in
-  let width = if collapse_width then width else constraints.max_width in
-  if has_flex then { width; height = constraints.max_height }
-  else { width; height }
+  let height =
+    if flex_data.num_flex_height_children > 0 then constraints.max_height
+    else flex_data.occupied_non_flex_height
+  in
+  { width; height }
+
+let min_size collapse_width children constraints =
+  let flex_data = calc_flex_data children constraints in
+  let constraints =
+    Column_row.collapse_constraints Column collapse_width flex_data constraints
+  in
+  min_size_internal flex_data constraints
 
 let min_draw collapse_width children constraints =
   let flex_data = calc_flex_data children constraints in
   let constraints =
-    if collapse_width then
-      { constraints with max_width = flex_data.max_child_width }
-    else constraints
+    Column_row.collapse_constraints Column collapse_width flex_data constraints
   in
   if flex_data.num_flex_height_children > 0 then
     flex_draw Column flex_data children constraints
   else
-    let _, height, width =
+    let _ =
       Array.fold_left
-        (fun (start_y, acc_h, max_w) el ->
+        (fun start_y el ->
           let constraints = { constraints with start_y } in
           let size = Drawable.draw constraints el in
-          (* Values for next iteration. *)
-          let start_y = start_y + size.height in
-          let acc_h = size.height + acc_h in
-          let max_h = max max_w size.width in
-          (start_y, acc_h, max_h))
-        (constraints.start_y, 0, 0)
-        children
+          start_y + size.height)
+        constraints.start_y children
     in
-    let width = if collapse_width then width else constraints.min_width in
-    { width; height }
+    min_size_internal flex_data constraints
 
 let min ?(collapse_width = true) children =
   Widget (min_draw collapse_width children, min_size collapse_width children)
@@ -83,9 +73,7 @@ let directional_draw calc_start_y collapse_width children constraints =
         (fun start_y el ->
           let constraints = { constraints with start_y } in
           let size = Drawable.draw constraints el in
-          (* Values for next iteration. *)
-          let start_y = start_y + size.height in
-          start_y)
+          start_y + size.height)
         start_y children
     in
     { width = constraints.max_width; height = constraints.max_height }
