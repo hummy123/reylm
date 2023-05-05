@@ -2,50 +2,16 @@ open Drawable
 open Flex
 open Column_row
 
-(* Functions for drawing row at minimum size required by children,
-   not expanding as with normal behaviour. *)
-let min_size_internal flex_data constraints =
-  let width =
-    if flex_data.num_flex_width_children > 0 then constraints.max_width
-    else flex_data.occupied_non_flex_width
-  in
-  let height =
-    if flex_data.num_flex_height_children > 0 then constraints.max_height
-    else flex_data.occupied_non_flex_height
-  in
-  { width; height }
-
-let min_size collapse_width children constraints =
-  let flex_data = calc_flex_data children constraints in
-  let constraints =
-    Column_row.collapse_constraints Column collapse_width flex_data constraints
-  in
-  min_size_internal flex_data constraints
-
-let min_draw collapse_width children constraints =
-  let flex_data = calc_flex_data children constraints in
-  let constraints =
-    Column_row.collapse_constraints Column collapse_width flex_data constraints
-  in
-  if flex_data.num_flex_height_children > 0 then
-    flex_draw Column flex_data children constraints
-  else
-    let _ =
-      Array.fold_left
-        (fun start_y el ->
-          let constraints = { constraints with start_y } in
-          let size = Drawable.draw constraints el in
-          start_y + size.height)
-        constraints.start_y children
-    in
-    min_size_internal flex_data constraints
-
 let min ?(collapse_width = true) children =
-  Widget (min_draw collapse_width children, min_size collapse_width children)
+  Widget
+    ( min_draw collapse_width children Column,
+      min_size collapse_width children Column )
 
 (* Functions for drawing row at maximum size according to different directions. *)
 let max_size collapse_width children constraints =
-  let { width; _ } = min_size collapse_width children constraints in
+  let { width; _ } =
+    Column_row.min_size collapse_width children Column constraints
+  in
   { height = constraints.max_height; width }
 
 (* This abstracts some logicin each draw function below.
@@ -53,9 +19,7 @@ let max_size collapse_width children constraints =
 let flex_draw_if_flex_children collapse_width children constraints f_not_flex =
   let flex_data = calc_flex_data children constraints in
   let constraints =
-    if collapse_width then
-      { constraints with max_width = flex_data.max_child_width }
-    else constraints
+    Column_row.collapse_constraints Column collapse_width flex_data constraints
   in
   if flex_data.num_flex_height_children > 0 then
     flex_draw Column flex_data children constraints
