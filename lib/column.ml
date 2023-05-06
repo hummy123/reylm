@@ -8,11 +8,6 @@ let min ?(collapse_width = true) children =
       min_size collapse_width children Column )
 
 (* Functions for drawing row at maximum size according to different directions. *)
-let max_size collapse_width children constraints =
-  let { width; _ } =
-    Column_row.min_size collapse_width children Column constraints
-  in
-  { height = constraints.max_height; width }
 
 (* This abstracts some logicin each draw function below.
    It checks if any children are flex and, if so, they are provided to the flex_draw instead.*)
@@ -50,7 +45,7 @@ let calc_start_y_left _ _ = 0
 let top ?(collapse_width = true) children =
   Widget
     ( directional_draw calc_start_y_left collapse_width children,
-      max_size collapse_width children )
+      Column_row.max_size collapse_width children Column )
 
 (* Functions for drawing row aligned to center. *)
 let calc_start_y_center constraints flex_data =
@@ -59,7 +54,7 @@ let calc_start_y_center constraints flex_data =
 let center ?(collapse_width = true) children =
   Widget
     ( directional_draw calc_start_y_center collapse_width children,
-      max_size collapse_width children )
+      Column_row.max_size collapse_width children Column )
 
 (* Functions for drawing row aligned to right. *)
 let calc_start_y_right constraints flex_data =
@@ -68,7 +63,7 @@ let calc_start_y_right constraints flex_data =
 let bottom ?(collapse_width = true) children =
   Widget
     ( directional_draw calc_start_y_right collapse_width children,
-      max_size collapse_width children )
+      Column_row.max_size collapse_width children Column )
 
 (* Functions for drawing row with space in between/around. *)
 let spacer = Spacer.vertical ()
@@ -92,7 +87,7 @@ let draw_space_between collapse_height children constraints =
 let space_between ?(collapse_height = true) children =
   Widget
     ( draw_space_between collapse_height children,
-      max_size collapse_height children )
+      Column_row.max_size collapse_height children Column )
 
 let draw_space_around collapse_height children constraints =
   let if_not_flex _ constraints =
@@ -111,4 +106,4 @@ let draw_space_around collapse_height children constraints =
 let space_around ?(collapse_height = true) children =
   Widget
     ( draw_space_around collapse_height children,
-      max_size collapse_height children )
+      Column_row.max_size collapse_height children Column )

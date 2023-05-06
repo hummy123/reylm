@@ -126,3 +126,12 @@ let min_draw should_collapse children caller constraints =
         children
     in
     min_size_internal flex_data constraints
+
+(* Functions for drawing column/row where height (if column) or width (if row) takes full constraints. *)
+let max_size should_collapse children caller constraints =
+  let { width; height } =
+    min_size should_collapse children caller constraints
+  in
+  match caller with
+  | Column -> { height = constraints.max_height; width }
+  | Row -> { width = constraints.min_width; height }
