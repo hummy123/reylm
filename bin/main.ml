@@ -1,7 +1,7 @@
 open Reyml
 
 let view =
-  Column.bottom
+  Column.space_around
     [|
       Rect.widget ~width:300 ~height:80 ~color:Raylib.Color.gray ();
       Rect.widget ~width:300 ~height:80 ~color:Raylib.Color.red ();
