@@ -141,9 +141,15 @@ let flex_draw_if_flex_children should_collapse children caller constraints
   let constraints =
     collapse_constraints caller should_collapse flex_data constraints
   in
-  if flex_data.num_flex_height_children > 0 then
-    flex_draw caller flex_data children constraints
-  else f_not_flex flex_data constraints
+  match caller with
+  | Column ->
+      if flex_data.num_flex_height_children > 0 then
+        flex_draw caller flex_data children constraints
+      else f_not_flex flex_data constraints
+  | Row ->
+      if flex_data.num_flex_width_children > 0 then
+        flex_draw caller flex_data children constraints
+      else f_not_flex flex_data constraints
 
 (*
     Generic function for aligning to a direction (left, center, right).
@@ -182,14 +188,8 @@ let calc_when_end caller constraints flex_data =
 
 (* Functions for drawing column/row with space between or space around. *)
 let row_spacer = Spacer.horizontal ()
-let row_double_spacer = Spacer.horizontal ~flex_val:2. ()
 let col_spacer = Spacer.vertical ()
-let col_double_spacer = Spacer.vertical ~flex_val:2. ()
 let get_spacer = function Column -> col_spacer | Row -> row_spacer
-
-let get_double_spacer = function
-  | Column -> col_double_spacer
-  | Row -> row_double_spacer
 
 let draw_space_between should_collapse children caller constraints =
   let if_not_flex _ constraints =
@@ -209,18 +209,22 @@ let draw_space_between should_collapse children caller constraints =
     if_not_flex
 
 let draw_space_around should_collapse children caller constraints =
-  let if_not_flex _ constraints =
-    let spacer = get_spacer caller in
-    let double_spacer = get_double_spacer caller in
-    let children =
-      Array.fold_right
-        (fun el acc -> double_spacer :: el :: acc)
-        children [ spacer ]
-      |> Array.of_list
+  (* if_not_flex function has to add spacing by itself,
+     because the same spacer trick used in space_between doesn't work for space_around. *)
+  let if_not_flex flex_data constraints =
+    let remaining_space = calc_remaining_space constraints flex_data caller in
+    let start_pos = calc_start_pos constraints caller in
+    let space = int_of_float remaining_space / Array.length children in
+    let _ =
+      Array.fold_left
+        (fun start_pos el ->
+          let constraints = set_start_pos constraints start_pos caller in
+          let size = Drawable.draw constraints el in
+          increment_start_pos (start_pos + space) size caller)
+        (start_pos + (space / 2))
+        children
     in
-    Array.unsafe_set children 0 spacer;
-    let flex_data = Flex.calc_flex_data children constraints in
-    flex_draw caller flex_data children constraints
+    { width = constraints.max_width; height = constraints.max_height }
   in
   flex_draw_if_flex_children should_collapse children caller constraints
     if_not_flex
