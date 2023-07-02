@@ -14,7 +14,7 @@ let size width height constraints =
   in
   { width; height }
 
-let draw width height radius color constraints =
+let draw width height radius color child constraints =
   let ({ width; height } as w_size) = size width height constraints in
   let f_width = float_of_int width in
   let f_height = float_of_int height in
@@ -22,7 +22,11 @@ let draw width height radius color constraints =
   let y = float_of_int constraints.start_y in
   let rect = Rectangle.create x y f_width f_height in
   Raylib.draw_rectangle_rounded rect radius 0 color;
+  let child_constraints =
+    { constraints with max_height = height; max_width = width }
+  in
+  let _ = draw child_constraints child in
   w_size
 
-let widget ?(radius = 0.0) ?(color = Color.black) ~width ~height () =
-  Widget (draw width height radius color, size width height)
+let widget ?(radius = 0.0) ?(color = Color.black) ~width ~height child =
+  Widget (draw width height radius color child, size width height)

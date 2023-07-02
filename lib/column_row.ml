@@ -88,7 +88,7 @@ let collapse_constraints caller should_collapse flex_data constraints =
 
 (* Functions for drawing column or row at minimum size required by children,
    leaving empty space, unlike normal behaviour. *)
-let min_size_internal flex_data constraints =
+let get_flex_width_height flex_data constraints =
   let width =
     if flex_data.num_flex_width_children > 0 then constraints.max_width
     else flex_data.occupied_non_flex_width
@@ -104,7 +104,7 @@ let min_size should_collapse children caller constraints =
   let constraints =
     collapse_constraints caller should_collapse flex_data constraints
   in
-  min_size_internal flex_data constraints
+  get_flex_width_height flex_data constraints
 
 let min_draw should_collapse children caller constraints =
   let flex_data = Flex.calc_flex_data children constraints in
@@ -123,16 +123,15 @@ let min_draw should_collapse children caller constraints =
         (get_start_pos constraints caller)
         children
     in
-    min_size_internal flex_data constraints
+    get_flex_width_height flex_data constraints
 
 (* Functions for drawing column/row where height (if column) or width (if row) takes full constraints. *)
 let max_size should_collapse children caller constraints =
-  let { width; height } =
-    min_size should_collapse children caller constraints
+  let flex_data = Flex.calc_flex_data children constraints in
+  let constraints =
+    collapse_constraints caller should_collapse flex_data constraints
   in
-  match caller with
-  | Column -> { height = constraints.max_height; width }
-  | Row -> { width = constraints.min_width; height }
+  { height = constraints.max_height; width = constraints.max_width }
 
 (* This abstracts some logicin each draw function below.
    It checks if any children are flex and, if so, they are provided to the flex_draw instead.*)

@@ -24,5 +24,15 @@ let draw l t r b child constraints =
   let { width; height } = Drawable.draw child_constraints child in
   { width = width + l + r; height = height + t + b }
 
-let widget ?(left = 0) ?(top = 0) ?(right = 0) ?(bottom = 0) child =
+let from_ltrb ?(left = 0) ?(top = 0) ?(right = 0) ?(bottom = 0) child =
   Widget (draw left top right bottom child, size left top right bottom child)
+
+let by_axis ?(vertical = 0) ?(horizontal = 0) child =
+  Widget
+    ( draw horizontal vertical horizontal vertical child,
+      size horizontal vertical horizontal vertical child )
+
+let all pad_by child =
+  Widget
+    ( draw pad_by pad_by pad_by pad_by child,
+      size pad_by pad_by pad_by pad_by child )

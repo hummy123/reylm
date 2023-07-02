@@ -31,12 +31,12 @@ let bottom ?(collapse_width = true) children =
       Column_row.max_size collapse_width children Column )
 
 (* Functions for drawing row with space in between/around. *)
-let space_between ?(collapse_height = true) children =
+let space_between ?(collapse_width = true) children =
   Widget
-    ( Column_row.draw_space_between collapse_height children Column,
-      Column_row.max_size collapse_height children Column )
+    ( Column_row.draw_space_between collapse_width children Column,
+      Column_row.max_size collapse_width children Column )
 
-let space_around ?(collapse_height = true) children =
+let space_around ?(collapse_width = true) children =
   Widget
-    ( Column_row.draw_space_around collapse_height children Column,
-      Column_row.max_size collapse_height children Column )
+    ( Column_row.draw_space_around collapse_width children Column,
+      Column_row.max_size collapse_width children Column )
