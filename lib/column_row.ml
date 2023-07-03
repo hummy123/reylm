@@ -88,29 +88,35 @@ let collapse_constraints caller should_collapse flex_data constraints =
 
 (* Functions for drawing column or row at minimum size required by children,
    leaving empty space, unlike normal behaviour. *)
-let get_flex_width_height flex_data constraints =
-  let width =
-    if flex_data.num_flex_width_children > 0 then constraints.max_width
-    else flex_data.occupied_non_flex_width
-  in
-  let height =
-    if flex_data.num_flex_height_children > 0 then constraints.max_height
-    else flex_data.occupied_non_flex_height
-  in
-  { width; height }
+let cakc_min_size caller flex_data constraints =
+  match caller with
+  | Column ->
+      let width =
+        if flex_data.num_flex_width_children > 0 then constraints.max_width
+        else flex_data.max_child_width
+      in
+      let height =
+        if flex_data.num_flex_height_children > 0 then constraints.max_height
+        else flex_data.occupied_non_flex_height
+      in
+      { width; height }
+  | Row ->
+      let width =
+        if flex_data.num_flex_width_children > 0 then constraints.max_width
+        else flex_data.occupied_non_flex_width
+      in
+      let height =
+        if flex_data.num_flex_height_children > 0 then constraints.max_height
+        else flex_data.max_child_height
+      in
+      { width; height }
 
-let min_size should_collapse children caller constraints =
+let min_size children caller constraints =
   let flex_data = Flex.calc_flex_data children constraints in
-  let constraints =
-    collapse_constraints caller should_collapse flex_data constraints
-  in
-  get_flex_width_height flex_data constraints
+  cakc_min_size caller flex_data constraints
 
-let min_draw should_collapse children caller constraints =
+let min_draw children caller constraints =
   let flex_data = Flex.calc_flex_data children constraints in
-  let constraints =
-    collapse_constraints caller should_collapse flex_data constraints
-  in
   if is_in_flex_direction flex_data caller then
     flex_draw caller flex_data children constraints
   else
@@ -123,7 +129,7 @@ let min_draw should_collapse children caller constraints =
         (get_start_pos constraints caller)
         children
     in
-    get_flex_width_height flex_data constraints
+    cakc_min_size caller flex_data constraints
 
 (* Functions for drawing column/row where height (if column) or width (if row) takes full constraints. *)
 let max_size should_collapse children caller constraints =

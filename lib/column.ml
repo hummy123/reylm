@@ -1,9 +1,8 @@
 open Drawable
 
-let min ?(collapse_width = true) children =
+let min children =
   Widget
-    ( Column_row.min_draw collapse_width children Column,
-      Column_row.min_size collapse_width children Column )
+    (Column_row.min_draw children Column, Column_row.min_size children Column)
 
 let top ?(collapse_width = true) children =
   Widget
