@@ -18,15 +18,15 @@ let wrap_inner caller wrap_type children =
       | Min -> Row.min children
       | SpaceAround -> Row.space_around children
       | SpaceBetween -> Row.space_between children
-      | Start -> Row.left children
-      | End -> Row.right children)
+      | Start -> Row.left ~collapse_height:true children
+      | End -> Row.right ~collapse_height:true children)
   | Column -> (
       match wrap_type with
       | Min -> Column.min children
       | SpaceAround -> Column.space_around children
       | SpaceBetween -> Column.space_between children
-      | Start -> Column.top children
-      | End -> Column.bottom children)
+      | Start -> Column.top ~collapse_width:true children
+      | End -> Column.bottom ~collapse_width:true children)
 
 let wrap_outer caller children =
   match caller with Row -> Column.min children | Column -> Row.min children
