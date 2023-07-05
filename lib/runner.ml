@@ -31,4 +31,5 @@ let run_app ?(window_title = default_title) view =
   let width = 1600 in
   let height = 900 in
   Raylib.init_window width height window_title;
+  Raylib.enable_event_waiting ();
   loop view
