@@ -9,5 +9,6 @@ module Row = Row
 module Spacer = Spacer
 module Sized_box = Sized_box
 module Wrap = Wrap
+module Conditional = Conditional
 
 let run_app = Runner.run_app
