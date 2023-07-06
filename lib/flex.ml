@@ -1,4 +1,3 @@
-open Constraints
 open Drawable
 
 let expand ?(flex_val = 1.) child = Flex (flex_val, Expand, child)
@@ -6,7 +5,7 @@ let fill_height ?(flex_val = 1.) child = Flex (flex_val, FillHeight, child)
 let fill_width ?(flex_val = 1.) child = Flex (flex_val, FillWidth, child)
 let natural_size ?(flex_val = 1.) child = Flex (flex_val, NaturalSize, child)
 
-let calc_flex_data children (constraints : Constraints.input_constraints) =
+let calc_flex_data children constraints =
   Array.fold_left
     (fun flex_data el ->
       match el with
@@ -27,7 +26,7 @@ let calc_flex_data children (constraints : Constraints.input_constraints) =
       | Flex (flex_value, FillWidth, _) ->
           let total_flex_width = flex_data.total_flex_width +. flex_value in
           let num_flex_width_children = flex_data.num_flex_width_children + 1 in
-          let ({ height; _ } : drawable_size) = Drawable.size constraints el in
+          let { height; _ } = Drawable.size constraints el in
           let max_child_height = max height flex_data.max_child_height in
           let occupied_non_flex_height =
             flex_data.occupied_non_flex_height + height
@@ -44,7 +43,7 @@ let calc_flex_data children (constraints : Constraints.input_constraints) =
           let num_flex_height_children =
             flex_data.num_flex_height_children + 1
           in
-          let ({ width; _ } : drawable_size) = Drawable.size constraints el in
+          let { width; _ } = Drawable.size constraints el in
           let max_child_width = max width flex_data.max_child_width in
           let occupied_non_flex_width =
             flex_data.occupied_non_flex_width + width
@@ -57,9 +56,7 @@ let calc_flex_data children (constraints : Constraints.input_constraints) =
             occupied_non_flex_width;
           }
       | _ ->
-          let ({ width; height } : drawable_size) =
-            Drawable.size constraints el
-          in
+          let { width; height } = Drawable.size constraints el in
           let occupied_non_flex_width =
             flex_data.occupied_non_flex_width + width
           in

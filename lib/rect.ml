@@ -1,8 +1,7 @@
 open Raylib
-open Constraints
 open Drawable
 
-let size width height (constraints : input_constraints) =
+let size width height constraints =
   let width =
     if constraints.min_width > width then constraints.min_width
     else if constraints.max_width < width then constraints.max_width
@@ -16,9 +15,7 @@ let size width height (constraints : input_constraints) =
   { width; height }
 
 let draw width height radius color child constraints =
-  let (({ width; height } : drawable_size) as w_size) =
-    size width height constraints
-  in
+  let ({ width; height } as w_size) = size width height constraints in
   let f_width = float_of_int width in
   let f_height = float_of_int height in
   let x = float_of_int constraints.start_x in
@@ -31,24 +28,5 @@ let draw width height radius color child constraints =
   let _ = draw child_constraints child in
   w_size
 
-let update width height radius color child constraints =
-  let (({ width; height } : drawable_size)) =
-    size width height (drop_model constraints)
-  in
-  let f_width = float_of_int width in
-  let f_height = float_of_int height in
-  let x = float_of_int constraints.start_x in
-  let y = float_of_int constraints.start_y in
-  let rect = Rectangle.create x y f_width f_height in
-  Raylib.draw_rectangle_rounded rect radius 0 color;
-  let child_constraints =
-    { constraints with max_height = height; max_width = width }
-  in
-  let { model; _ } = Drawable.update_model child_constraints child in
-  { width; height; model }
-
 let widget ?(radius = 0.0) ?(color = Color.black) ~width ~height child =
-  Widget
-    ( draw width height radius color child,
-      size width height,
-      update width height radius color child )
+  Widget (draw width height radius color child, size width height)
