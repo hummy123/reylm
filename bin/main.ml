@@ -1,22 +1,25 @@
 open Reyml
 
-let view num =
-  Column.min
-    [|
-      Wrap.row_right ~row_padding:50
-        [|
-          Rect.widget ~width:num ~height:80 ~color:Raylib.Color.gray Empty;
-          Conditional.exec (fun model -> model > 0) (fun model -> model + 10);
-          Rect.widget ~width:num ~height:80 ~color:Raylib.Color.red Empty;
-          Rect.widget ~width:num ~height:80 ~color:Raylib.Color.gray Empty;
-          Rect.widget ~width:num ~height:80 ~color:Raylib.Color.red Empty;
-          Rect.widget ~width:num ~height:80 ~color:Raylib.Color.gray Empty;
-          Rect.widget ~width:num ~height:80 ~color:Raylib.Color.red Empty;
-        |];
-      Rect.widget ~width:num ~height:100 ~color:Raylib.Color.black Empty;
-      Rect.widget ~width:num ~height:100 ~color:Raylib.Color.gold Empty;
-      Rect.widget ~width:num ~height:100 ~color:Raylib.Color.skyblue Empty;
-    |]
+type dir = Left | Right
+type model = { dir : dir; left : int }
 
-let num = 30
-let () = run_app view num
+let initial = { dir = Right; left = 0 }
+
+let view model =
+  Padding.from_ltrb ~left:model.left
+    (Row.left
+       [|
+         Rect.widget ~width:100 ~height:100 ~color:Raylib.Color.gray Empty;
+         Conditional.exec
+           (fun _ -> true)
+           (fun model ->
+             match model.dir with
+             | Left ->
+                 if model.left < 1000 then { model with left = model.left + 5 }
+                 else { model with dir = Right }
+             | Right ->
+                 if model.left >= 0 then { model with left = model.left - 5 }
+                 else { model with dir = Left });
+       |])
+
+let () = run_app view initial
