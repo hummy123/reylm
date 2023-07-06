@@ -1,3 +1,4 @@
+open Constraints
 open Drawable
 
 let size width height constraints =
@@ -14,25 +15,20 @@ let size width height constraints =
   { width; height }
 
 let draw width height child constraints =
-  let max_child_width =
-    if width < constraints.min_width then constraints.min_width
-    else if width > constraints.max_width then constraints.max_width
-    else width
-  in
-  let max_child_height =
-    if height < constraints.min_height then constraints.min_height
-    else if height > constraints.max_height then constraints.max_height
-    else height
-  in
+  let ({ width; height } : drawable_size) = size width height constraints in
   let child_constraints =
-    {
-      constraints with
-      max_height = max_child_height;
-      max_width = max_child_width;
-    }
+    { constraints with max_height = width; max_width = height }
   in
   let _ = draw child_constraints child in
   size width height constraints
 
+let update width height child constraints model =
+  let ({ width; height } : drawable_size) = size width height constraints in
+  let child_constraints =
+    { constraints with max_height = width; max_width = height }
+  in
+  let { model; _ } = update child_constraints model child in
+  { width; height; model }
+
 let widget ~width ~height child =
-  Widget (draw width height child, size width height)
+  Widget (draw width height child, size width height, update width height child)
