@@ -2,6 +2,7 @@
     This private module contains abstract functions for the Column and Row modules which have nearly identical logic.
 *)
 
+open Constraints
 open Drawable
 
 (* This type tells us which axis to draw along. *)
@@ -9,7 +10,15 @@ type caller = Row | Column
 
 (* These functions below are for drawing with a flex child. *)
 (* Helper functions. *)
-let calc_remaining_space constraints flex_data = function
+let calc_remaining_space (constraints : input_constraints) flex_data = function
+  | Column ->
+      constraints.max_height - flex_data.occupied_non_flex_height
+      |> float_of_int
+  | Row ->
+      constraints.max_width - flex_data.occupied_non_flex_width |> float_of_int
+
+let update_calc_remaining_space (constraints : 'a state_constraints) flex_data =
+  function
   | Column ->
       constraints.max_height - flex_data.occupied_non_flex_height
       |> float_of_int
@@ -20,23 +29,46 @@ let calc_total_flex flex_data = function
   | Column -> flex_data.total_flex_height
   | Row -> flex_data.total_flex_width
 
-let calc_start_pos constraints = function
+let calc_start_pos (constraints : input_constraints) = function
   | Column -> constraints.start_y
   | Row -> constraints.start_x
 
-let set_flex_child_constraints constraints el_size start_pos = function
+let update_calc_start_pos (constraints : 'a state_constraints) = function
+  | Column -> constraints.start_y
+  | Row -> constraints.start_x
+
+let set_flex_child_constraints (constraints : input_constraints) el_size
+    start_pos = function
   | Column -> { constraints with max_height = el_size; start_y = start_pos }
   | Row -> { constraints with max_width = el_size; start_x = start_pos }
 
-let set_start_pos constraints start_pos = function
+let update_set_flex_child_constraints (constraints : 'a state_constraints)
+    el_size start_pos = function
+  | Column -> { constraints with max_height = el_size; start_y = start_pos }
+  | Row -> { constraints with max_width = el_size; start_x = start_pos }
+
+let set_start_pos (constraints : input_constraints) start_pos = function
   | Column -> { constraints with start_y = start_pos }
   | Row -> { constraints with start_x = start_pos }
 
-let increment_start_pos start_pos size = function
+let update_set_start_pos (constraints : 'a state_constraints) start_pos =
+  function
+  | Column -> { constraints with start_y = start_pos }
+  | Row -> { constraints with start_x = start_pos }
+
+let increment_start_pos start_pos (size : drawable_size) = function
   | Column -> start_pos + size.height
   | Row -> start_pos + size.width
 
-let get_start_pos constraints = function
+let update_increment_start_pos start_pos (size : 'a model_output) = function
+  | Column -> start_pos + size.height
+  | Row -> start_pos + size.width
+
+let get_start_pos (constraints : input_constraints) = function
+  | Column -> constraints.start_y
+  | Row -> constraints.start_x
+
+let update_get_start_pos (constraints : 'a state_constraints) = function
   | Column -> constraints.start_y
   | Row -> constraints.start_x
 
@@ -68,6 +100,39 @@ let flex_draw caller flex_data children constraints =
       start_pos children
   in
   { height = constraints.max_height; width = constraints.max_width }
+
+(* Same as flex_draw, but works with state_constraints and returns model_output instead. *)
+let flex_update caller flex_data children (constraints : 'a state_constraints) =
+  let remaining_space =
+    update_calc_remaining_space constraints flex_data caller
+  in
+  let total_flex = calc_total_flex flex_data caller in
+  let start_pos = update_calc_start_pos constraints caller in
+  let _, model =
+    Array.fold_left
+      (fun (start_pos, model) el ->
+        let constraints =
+          match el with
+          | Flex (flex_value, (Expand | FillHeight | FillWidth), _) ->
+              let flex_percent = flex_value /. total_flex in
+              let el_size =
+                remaining_space *. flex_percent |> Float.round |> int_of_float
+              in
+              update_set_flex_child_constraints constraints el_size start_pos
+                caller
+          | _ -> update_set_start_pos constraints start_pos caller
+        in
+        let child_output =
+          Drawable.update_model { constraints with model } el
+        in
+        let start_pos =
+          update_increment_start_pos start_pos child_output caller
+        in
+        (start_pos, child_output.model))
+      (start_pos, constraints.model)
+      children
+  in
+  { height = constraints.max_height; width = constraints.max_width; model }
 
 (*
     This function collapses constraints on the opposite axis.
@@ -118,7 +183,7 @@ let min_size children caller constraints =
 let min_draw children caller constraints =
   let flex_data = Flex.calc_flex_data children constraints in
   if is_in_flex_direction flex_data caller then
-    flex_draw caller flex_data children constraints
+    flex_update caller flex_data children constraints
   else
     let _ =
       Array.fold_left
@@ -150,11 +215,11 @@ let flex_draw_if_flex_children should_collapse children caller constraints
   match caller with
   | Column ->
       if flex_data.num_flex_height_children > 0 then
-        flex_draw caller flex_data children constraints
+        flex_update caller flex_data children constraints
       else f_not_flex flex_data constraints
   | Row ->
       if flex_data.num_flex_width_children > 0 then
-        flex_draw caller flex_data children constraints
+        flex_update caller flex_data children constraints
       else f_not_flex flex_data constraints
 
 (*
@@ -209,7 +274,7 @@ let draw_space_between should_collapse children caller constraints =
       match children with _ :: tail -> tail |> Array.of_list | _ -> [||]
     in
     let flex_data = Flex.calc_flex_data children constraints in
-    flex_draw caller flex_data children constraints
+    flex_update caller flex_data children constraints
   in
   flex_draw_if_flex_children should_collapse children caller constraints
     if_not_flex
