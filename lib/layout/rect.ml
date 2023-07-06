@@ -32,7 +32,7 @@ let draw width height radius color child constraints =
   w_size
 
 let update width height radius color child constraints =
-  let (({ width; height } : drawable_size) as w_size) =
+  let (({ width; height } : drawable_size)) =
     size width height (drop_model constraints)
   in
   let f_width = float_of_int width in

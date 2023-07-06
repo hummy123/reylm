@@ -44,8 +44,8 @@ let set_flex_child_constraints (constraints : input_constraints) el_size
 
 let update_set_flex_child_constraints model (constraints : 'a state_constraints)
     el_size start_pos = function
-  | Column -> { constraints with max_height = el_size; start_y = start_pos }
-  | Row -> { constraints with max_width = el_size; start_x = start_pos }
+      | Column -> { constraints with max_height = el_size; start_y = start_pos; model }
+      | Row -> { constraints with max_width = el_size; start_x = start_pos; model }
 
 let set_start_pos (constraints : input_constraints) start_pos = function
   | Column -> { constraints with start_y = start_pos }
