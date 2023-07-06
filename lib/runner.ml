@@ -1,11 +1,12 @@
 open Raylib
+open Constraints
 open Drawable
 
 let default_bg = Raylib.Color.create 243 243 243 255
 let default_title = "default_title"
 
-let run_app ?(window_title = default_title) view =
-  let rec loop view =
+let run_app ?(window_title = default_title) view initial_model =
+  let rec loop view model =
     match
       (Raylib.window_should_close (), Raylib.is_key_pressed Raylib.Key.Escape)
     with
@@ -24,8 +25,9 @@ let run_app ?(window_title = default_title) view =
         begin_drawing ();
         clear_background default_bg;
         let _ = Drawable.draw constraints_from_root view in
+        let { model; _ } = Drawable.update constraints_from_root model view in
         end_drawing ();
-        loop view
+        loop view model
   in
   Raylib.set_config_flags [ Window_maximized; Window_resizable; Vsync_hint ];
   let width = 1600 in
