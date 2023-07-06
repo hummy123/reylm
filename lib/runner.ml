@@ -12,6 +12,7 @@ let run_app ?(window_title = default_title) view initial_model =
     with
     | true, false -> Raylib.close_window ()
     | _ ->
+        let cur_view = view model in
         let constraints_from_root =
           {
             start_x = 0;
@@ -24,8 +25,10 @@ let run_app ?(window_title = default_title) view initial_model =
         in
         begin_drawing ();
         clear_background default_bg;
-        let _ = Drawable.draw constraints_from_root view in
-        let { model; _ } = Drawable.update constraints_from_root model view in
+        let _ = Drawable.draw constraints_from_root cur_view in
+        let { model; _ } =
+          Drawable.update constraints_from_root model cur_view
+        in
         end_drawing ();
         loop view model
   in
@@ -34,4 +37,4 @@ let run_app ?(window_title = default_title) view initial_model =
   let height = 900 in
   Raylib.init_window width height window_title;
   Raylib.enable_event_waiting ();
-  loop view
+  loop view initial_model

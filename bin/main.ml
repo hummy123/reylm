@@ -1,6 +1,6 @@
 open Reyml
 
-let view =
+let view _ =
   Column.min
     [|
       Wrap.row_right ~row_padding:50
@@ -17,4 +17,4 @@ let view =
       Rect.widget ~width:100 ~height:100 ~color:Raylib.Color.skyblue Empty;
     |]
 
-let () = run_app view
+let () = run_app view ()

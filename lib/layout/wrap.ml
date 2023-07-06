@@ -1,5 +1,6 @@
-open Drawable
 open Column_row
+open Constraints
+open Drawable
 
 type wrap_type = Min | SpaceAround | SpaceBetween | Start | End
 
@@ -8,7 +9,7 @@ let get_direction_size caller constraints =
   | Row -> constraints.max_width
   | Column -> constraints.max_height
 
-let get_child_size caller child_size =
+let get_child_size caller (child_size : drawable_size) =
   match caller with Row -> child_size.width | Column -> child_size.height
 
 let wrap_inner caller wrap_type children =
@@ -17,14 +18,18 @@ let wrap_inner caller wrap_type children =
       match wrap_type with
       | Min -> Row.min children
       | SpaceAround -> Row.space_around children
-      | SpaceBetween -> Row.space_between children
+      | SpaceBetween ->
+          (* Row.space_between children *)
+          failwith ""
       | Start -> Row.left ~collapse_height:true children
       | End -> Row.right ~collapse_height:true children)
   | Column -> (
       match wrap_type with
       | Min -> Column.min children
       | SpaceAround -> Column.space_around children
-      | SpaceBetween -> Column.space_between children
+      | SpaceBetween ->
+          (* Column.space_between children *)
+          failwith ""
       | Start -> Column.top ~collapse_width:true children
       | End -> Column.bottom ~collapse_width:true children)
 
@@ -72,25 +77,40 @@ let draw_row wrap_type row_padding children constraints =
   in
   draw constraints children
 
+let update_row wrap_type row_padding children constraints model =
+  let children =
+    split_children Row wrap_type row_padding children constraints
+  in
+  update constraints model children
+
 let row_min ?(row_padding = 0) children =
-  Widget (draw_row Min row_padding children, size_row Min row_padding children)
+  Widget
+    ( draw_row Min row_padding children,
+      size_row Min row_padding children,
+      update_row Min row_padding children )
 
 let row_left ?(row_padding = 0) children =
   Widget
-    (draw_row Start row_padding children, size_row Start row_padding children)
+    ( draw_row Start row_padding children,
+      size_row Start row_padding children,
+      update_row Start row_padding children )
 
 let row_right ?(row_padding = 0) children =
-  Widget (draw_row End row_padding children, size_row End row_padding children)
+  Widget
+    ( draw_row End row_padding children,
+      size_row End row_padding children,
+      update_row End row_padding children )
 
 let row_space_around ?(row_padding = 0) children =
   Widget
     ( draw_row SpaceAround row_padding children,
-      size_row SpaceAround row_padding children )
+      size_row SpaceAround row_padding children,
+      update_row SpaceAround row_padding children )
 
-let row_space_between ?(row_padding = 0) children =
-  Widget
-    ( draw_row SpaceBetween row_padding children,
-      size_row SpaceBetween row_padding children )
+(* let row_space_between ?(row_padding = 0) children = *)
+(*   Widget *)
+(*     ( draw_row SpaceBetween row_padding children, *)
+(*       size_row SpaceBetween row_padding children ) *)
 
 (* Column functions. *)
 let size_column wrap_type col_padding children constraints =
@@ -105,25 +125,37 @@ let draw_column wrap_type col_padding children constraints =
   in
   draw constraints children
 
+let update_column wrap_type col_padding children constraints model =
+  let children =
+    split_children Column wrap_type col_padding children constraints
+  in
+  update constraints model children
+
 let column_min ?(col_padding = 0) children =
   Widget
-    (draw_column Min col_padding children, size_column Min col_padding children)
+    ( draw_column Min col_padding children,
+      size_column Min col_padding children,
+      update_column Min col_padding children )
 
 let column_top ?(col_padding = 0) children =
   Widget
     ( draw_column Start col_padding children,
-      size_column Min col_padding children )
+      size_column Start col_padding children,
+      update_column Start col_padding children )
 
 let column_bottom ?(col_padding = 0) children =
   Widget
-    (draw_column End col_padding children, size_column Min col_padding children)
+    ( draw_column End col_padding children,
+      size_column Min col_padding children,
+      update_column End col_padding children )
 
 let column_space_around ?(col_padding = 0) children =
   Widget
     ( draw_column SpaceAround col_padding children,
-      size_column SpaceAround col_padding children )
+      size_column SpaceAround col_padding children,
+      update_column SpaceAround col_padding children )
 
-let column_space_between ?(col_padding = 0) children =
-  Widget
-    ( draw_column SpaceBetween col_padding children,
-      size_column SpaceBetween col_padding children )
+(* let column_space_between ?(col_padding = 0) children = *)
+(*   Widget *)
+(*     ( draw_column SpaceBetween col_padding children, *)
+(*       size_column SpaceBetween col_padding children ) *)

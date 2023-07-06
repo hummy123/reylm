@@ -31,7 +31,7 @@ let draw width height radius color child constraints =
   let _ = draw child_constraints child in
   w_size
 
-let update width height radius color child constraints model =
+let update width height child constraints model =
   let ({ width; height } : drawable_size) = size width height constraints in
   let child_constraints =
     { constraints with max_height = height; max_width = width }
@@ -43,4 +43,4 @@ let widget ?(radius = 0.0) ?(color = Color.black) ~width ~height child =
   Widget
     ( draw width height radius color child,
       size width height,
-      update width height radius color child )
+      update width height child )
