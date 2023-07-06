@@ -1,4 +1,6 @@
+module Constraints = Constraints
 module Drawable = Drawable
+module Key = Key
 module Rect = Rect
 module Padding = Padding
 module Center = Center

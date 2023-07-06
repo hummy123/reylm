@@ -4,6 +4,7 @@ type dir = Left | Right
 type model = { dir : dir; left : int }
 
 let initial = { dir = Right; left = 0 }
+let k = Key.create ()
 
 let view model =
   Padding.from_ltrb ~left:model.left
