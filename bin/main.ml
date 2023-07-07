@@ -3,7 +3,7 @@ open Reyml
 type dir = Up | Down
 type model = { dir : dir; y_pos : float }
 
-let initial = { dir = Down; y_pos = 0.0 }
+let initial = { dir = Up; y_pos = 0.0 }
 let k = Key.create ()
 
 let view model =
