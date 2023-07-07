@@ -1,13 +1,13 @@
 open Reyml
 
-type dir = Left | Right
-type model = { dir : dir; left : int }
+type dir = Up | Down
+type model = { dir : dir; y_pos : float }
 
-let initial = { dir = Right; left = 0 }
+let initial = { dir = Down; y_pos = 0.0 }
 let k = Key.create ()
 
 let view model =
-  Padding.from_ltrb ~left:model.left
+  Align.widget ~y_shift:model.y_pos
     (Row.left
        [|
          Rect.widget ~width:100 ~height:100 ~color:Raylib.Color.gray Empty;
@@ -15,12 +15,14 @@ let view model =
            (fun _ -> true)
            (fun model ->
              match model.dir with
-             | Left ->
-                 if model.left < 1000 then { model with left = model.left + 5 }
-                 else { model with dir = Right }
-             | Right ->
-                 if model.left >= 0 then { model with left = model.left - 5 }
-                 else { model with dir = Left });
+             | Up ->
+                 if model.y_pos >= -1.0 then
+                   { model with y_pos = model.y_pos -. 0.01 }
+                 else { model with dir = Down }
+             | Down ->
+                 if model.y_pos <= 1.0 then
+                   { model with y_pos = model.y_pos +. 0.01 }
+                 else { model with dir = Up });
        |])
 
 let () = run_app view initial

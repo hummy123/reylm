@@ -26,15 +26,19 @@ let run_app ?(window_title = default_title) view initial_model =
         begin_drawing ();
         clear_background default_bg;
         let _ = Drawable.draw constraints_from_root cur_view in
-        let { model; _ } =
+        let { model = new_model; _ } =
           Drawable.update constraints_from_root model cur_view
         in
         end_drawing ();
-        loop view model
+        (* if model == new_model then *)
+        (*   Raylib.enable_event_waiting() *)
+        (* else *)
+        (*   Raylib.disable_event_waiting(); *)
+        loop view new_model
   in
   Raylib.set_config_flags [ Window_maximized; Window_resizable; Vsync_hint ];
   let width = 1600 in
   let height = 900 in
   Raylib.init_window width height window_title;
-  Raylib.enable_event_waiting ();
+  (* Raylib.enable_event_waiting (); *)
   loop view initial_model
