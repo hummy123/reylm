@@ -14,12 +14,9 @@ let animate model =
       if model.y_pos <= 1.0 then { model with y_pos = model.y_pos +. 0.015 }
       else { model with dir = Up }
 
+let key = Progress_bar.key ()
+
 let view model =
-  Row.space_around
-    [|
-      Align.widget ~x_shift:model.y_pos
-        (Rect.widget ~width:100 ~height:100 ~color:Raylib.Color.gray
-           (Conditional.exec (fun _ -> true) (fun model -> animate model)));
-    |]
+  Center.widget (Padding.by_axis ~horizontal:100 (Progress_bar.widget key))
 
 let () = run_app view initial
