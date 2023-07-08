@@ -18,6 +18,8 @@ let key () =
   total_keys := !total_keys + 1;
   key
 
+(* I don't 100% know what I am doing with modulate functions
+   but trying to make it look nice and it does. *)
 let modulate_width pos =
   let pos = if pos < 0. then pos *. -1.0 else pos in
   let pos = pos -. 1.0 in
@@ -26,12 +28,10 @@ let modulate_width pos =
   if pos <= 10. then pos +. 10. |> int_of_float else pos |> int_of_float
 
 let modulate_speed pos =
-  (* I don't 100% know what I am doing with this function
-     but trying to make it look nice and it does. *)
   let pos = if pos < 0. then pos *. -1.0 else pos in
   let pos = pos -. 1.0 in
   let pos = if pos < 0. then pos *. -1.0 else pos in
-  let pos = Easing.ease_in_circ pos *. 0.03 in
+  let pos = Easing.ease_in_quint pos *. 0.03 in
   if pos < 0.02 then 0.02 else pos
 
 let view key width height radius foreground_col background_col =
