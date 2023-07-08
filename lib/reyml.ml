@@ -10,6 +10,7 @@ module Column = Column
 module Row = Row
 module Spacer = Spacer
 module Sized_box = Sized_box
+module Percent_rect = Percent_rect
 module Wrap = Wrap
 module Conditional = Conditional
 module Progress_bar = Progress_bar
