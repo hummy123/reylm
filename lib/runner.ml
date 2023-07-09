@@ -5,6 +5,22 @@ open Drawable
 let default_bg = Raylib.Color.create 243 243 243 255
 let default_title = "default_title"
 
+(* State of default widgets. *)
+let widget_tables : (unit -> bool) array =
+  [| Progress_bar.Progress_state.did_change |]
+
+let rec did_widgets_change ?(value = false) pos =
+  if pos < 0 then value
+  else
+    let f = Array.unsafe_get widget_tables pos in
+    let is_true = f () in
+    did_widgets_change ~value:(value || is_true) (pos - 1)
+
+let should_redraw old_model new_model =
+  if old_model == new_model then
+    did_widgets_change (Array.length widget_tables - 1)
+  else true
+
 let run_app ?(window_title = default_title) view initial_model =
   let rec loop view model =
     match
@@ -30,15 +46,13 @@ let run_app ?(window_title = default_title) view initial_model =
           Drawable.update constraints_from_root model cur_view
         in
         end_drawing ();
-        (* if model == new_model then *)
-        (*   Raylib.enable_event_waiting() *)
-        (* else *)
-        (*   Raylib.disable_event_waiting(); *)
+        if should_redraw model new_model then Raylib.disable_event_waiting ()
+        else Raylib.enable_event_waiting ();
         loop view new_model
   in
   Raylib.set_config_flags [ Window_maximized; Window_resizable; Vsync_hint ];
   let width = 1600 in
   let height = 900 in
   Raylib.init_window width height window_title;
-  (* Raylib.enable_event_waiting (); *)
+  Raylib.enable_event_waiting ();
   loop view initial_model
