@@ -1,21 +1,20 @@
 open Reyml
 
-type model = { percent : float }
-
-let initial = { percent = 0.0 }
-let animate model = { percent = model.percent +. 0.01 }
-let key1 = Indeterminate_progress_bar.key ()
+let key = Indeterminate_progress_bar.key ()
 let key2 = Indeterminate_progress_bar.key ()
+let key3 = Indeterminate_progress_bar.key ()
+let key4 = Indeterminate_progress_bar.key ()
+let key5 = Indeterminate_progress_bar.key ()
 
 let view model =
   Padding.all 100
-    (Row.space_around
+    (Column.space_around
        [|
-         Padding.all 100
-           (Determinate_progress_bar.vertical ~percent:model.percent ());
-         Conditional.exec (model.percent < 1.0) animate;
-         Padding.all 100
-           (Determinate_progress_bar.horizontal ~percent:model.percent ());
+         Indeterminate_progress_bar.horizontal ~width:800 key;
+         Indeterminate_progress_bar.horizontal ~width:400 key2;
+         Indeterminate_progress_bar.horizontal ~width:200 key3;
+         Indeterminate_progress_bar.horizontal ~width:400 key4;
+         Indeterminate_progress_bar.horizontal ~width:800 key5;
        |])
 
-let () = run_app view initial
+let () = run_app view ()
