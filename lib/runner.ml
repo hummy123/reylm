@@ -7,7 +7,7 @@ let default_title = "default_title"
 
 (* State of default widgets. *)
 let widget_tables : (unit -> bool) array =
-  [| Progress_bar.Progress_state.did_change |]
+  [| Indeterminate_progress_bar.Progress_state.did_change |]
 
 let rec did_widgets_change ?(value = false) pos =
   if pos < 0 then value

@@ -13,6 +13,6 @@ module Sized_box = Sized_box
 module Percent_rect = Percent_rect
 module Wrap = Wrap
 module Conditional = Conditional
-module Progress_bar = Progress_bar
+module Indeterminate_progress_bar = Indeterminate_progress_bar
 
 let run_app = Runner.run_app

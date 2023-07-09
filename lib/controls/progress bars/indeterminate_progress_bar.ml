@@ -65,10 +65,10 @@ let view key width height radius foreground_col background_col axis =
 let default_bg = Raylib.Color.create 214 214 214 255
 let default_fg = Raylib.Color.create 0 102 180 255
 
-let indeterminate_hor ?(width = max_int) ?(height = 5) ?(radius = 1.0)
+let horizontal ?(width = max_int) ?(height = 5) ?(radius = 1.0)
     ?(background_col = default_bg) ?(foreground_col = default_fg) key =
   view key width height radius foreground_col background_col Horizontal
 
-let indeterminate_vert ?(width = 5) ?(height = max_int) ?(radius = 1.0)
+let vertical ?(width = 5) ?(height = max_int) ?(radius = 1.0)
     ?(background_col = default_bg) ?(foreground_col = default_fg) key =
   view key width height radius foreground_col background_col Vertical

@@ -14,10 +14,11 @@ let animate model =
       if model.y_pos <= 1.0 then { model with y_pos = model.y_pos +. 0.015 }
       else { model with dir = Up }
 
-let key = Progress_bar.key ()
+let key = Indeterminate_progress_bar.key ()
 
 let view model =
   Center.widget
-    (Padding.by_axis ~horizontal:100 (Progress_bar.indeterminate_vert key))
+    (Padding.by_axis ~horizontal:100
+       (Indeterminate_progress_bar.horizontal key))
 
 let () = run_app view initial
