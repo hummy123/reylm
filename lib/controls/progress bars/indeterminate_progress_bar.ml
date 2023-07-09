@@ -53,9 +53,7 @@ let view key width height radius foreground_col background_col axis =
   in
   let x_shift = match axis with Horizontal -> state.pos | Vertical -> 0.0 in
   let y_shift =
-    match axis with
-    | Horizontal -> 0.0
-    | Vertical -> if state.pos <> 0.0 then state.pos *. -1.0 else state.pos
+    match axis with Horizontal -> 0.0 | Vertical -> state.pos *. -1.0
   in
   Rect.widget ~radius ~width ~height ~color:background_col
     (Align.widget ~x_shift ~y_shift

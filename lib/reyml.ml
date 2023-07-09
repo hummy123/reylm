@@ -14,5 +14,6 @@ module Percent_rect = Percent_rect
 module Wrap = Wrap
 module Conditional = Conditional
 module Indeterminate_progress_bar = Indeterminate_progress_bar
+module Determinate_progress_bar = Determinate_progress_bar
 
 let run_app = Runner.run_app
