@@ -25,7 +25,6 @@ let () = run_app view ()
 
 (*
   Example 2.
-  (Comment out the above code, and uncomment the code below.)
  *)
 
 open Reyml

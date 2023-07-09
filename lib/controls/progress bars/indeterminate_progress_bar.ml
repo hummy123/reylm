@@ -36,7 +36,9 @@ let modulate_speed pos =
 
 type axis = Horizontal | Vertical
 
-let view key width height radius foreground_col background_col axis =
+(* view_horizontal and view_vertical can be abstracted into a single function,
+   but I don't like the if-statement branch and would prefer two nearly-identical short functions. *)
+let view_horizontal key width height radius foreground_col background_col =
   let state =
     match Progress_state.find_opt key with Some x -> x | None -> initial_state
   in
@@ -45,19 +47,25 @@ let view key width height radius foreground_col background_col axis =
     else { pos = state.pos +. modulate_speed state.pos }
   in
   Progress_state.set key next_state;
-  let foreground_width =
-    match axis with Horizontal -> modulate_size state.pos | Vertical -> width
-  in
-  let foreground_height =
-    match axis with Horizontal -> height | Vertical -> modulate_size state.pos
-  in
-  let x_shift = match axis with Horizontal -> state.pos | Vertical -> 0.0 in
-  let y_shift =
-    match axis with Horizontal -> 0.0 | Vertical -> state.pos *. -1.0
-  in
+  let foreground_width = modulate_size state.pos in
   Rect.widget ~radius ~width ~height ~color:background_col
-    (Align.widget ~x_shift ~y_shift
-       (Rect.widget ~radius ~width:foreground_width ~height:foreground_height
+    (Align.widget ~x_shift:state.pos
+       (Rect.widget ~radius ~width:foreground_width ~height
+          ~color:foreground_col Empty))
+
+let view_vertical key width height radius foreground_col background_col =
+  let state =
+    match Progress_state.find_opt key with Some x -> x | None -> initial_state
+  in
+  let next_state =
+    if state.pos >= 1.0 then initial_state
+    else { pos = state.pos +. modulate_speed state.pos }
+  in
+  Progress_state.set key next_state;
+  let foreground_height = modulate_size state.pos in
+  Rect.widget ~radius ~width ~height ~color:background_col
+    (Align.widget ~y_shift:(state.pos *. -1.0)
+       (Rect.widget ~radius ~width ~height:foreground_height
           ~color:foreground_col Empty))
 
 let default_bg = Raylib.Color.create 214 214 214 255
@@ -65,8 +73,8 @@ let default_fg = Raylib.Color.create 0 102 180 255
 
 let horizontal ?(width = max_int) ?(height = 5) ?(radius = 1.0)
     ?(background_col = default_bg) ?(foreground_col = default_fg) key =
-  view key width height radius foreground_col background_col Horizontal
+  view_horizontal key width height radius foreground_col background_col
 
 let vertical ?(width = 5) ?(height = max_int) ?(radius = 1.0)
     ?(background_col = default_bg) ?(foreground_col = default_fg) key =
-  view key width height radius foreground_col background_col Vertical
+  view_vertical key width height radius foreground_col background_col
