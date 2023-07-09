@@ -20,7 +20,7 @@ let key () =
 
 (* I don't 100% know what I am doing with modulate functions
    but trying to make it look nice and it does. *)
-let modulate_width pos =
+let modulate_size pos =
   let pos = if pos < 0. then pos *. -1.0 else pos in
   let pos = pos -. 1.0 in
   let pos = if pos < 0. then pos *. -1.0 else pos in
@@ -34,7 +34,9 @@ let modulate_speed pos =
   let pos = Easing.ease_in_quint pos *. 0.03 in
   if pos < 0.02 then 0.02 else pos
 
-let view key width height radius foreground_col background_col =
+type axis = Horizontal | Vertical
+
+let view key width height radius foreground_col background_col axis =
   let state =
     match Progress_state.find_opt key with Some x -> x | None -> initial_state
   in
@@ -43,15 +45,30 @@ let view key width height radius foreground_col background_col =
     else { pos = state.pos +. modulate_speed state.pos }
   in
   Progress_state.set key next_state;
-  let foreround_width = modulate_width state.pos in
+  let foreground_width =
+    match axis with Horizontal -> modulate_size state.pos | Vertical -> width
+  in
+  let foreground_height =
+    match axis with Horizontal -> height | Vertical -> modulate_size state.pos
+  in
+  let x_shift = match axis with Horizontal -> state.pos | Vertical -> 0.0 in
+  let y_shift =
+    match axis with
+    | Horizontal -> 0.0
+    | Vertical -> if state.pos <> 0.0 then state.pos *. -1.0 else state.pos
+  in
   Rect.widget ~radius ~width ~height ~color:background_col
-    (Align.widget ~x_shift:state.pos
-       (Rect.widget ~radius ~width:foreround_width ~height ~color:foreground_col
-          Empty))
+    (Align.widget ~x_shift ~y_shift
+       (Rect.widget ~radius ~width:foreground_width ~height:foreground_height
+          ~color:foreground_col Empty))
 
 let default_bg = Raylib.Color.create 214 214 214 255
 let default_fg = Raylib.Color.create 0 102 180 255
 
-let widget ?(width = max_int) ?(height = 5) ?(radius = 1.0)
+let indeterminate_hor ?(width = max_int) ?(height = 5) ?(radius = 1.0)
     ?(background_col = default_bg) ?(foreground_col = default_fg) key =
-  view key width height radius foreground_col background_col
+  view key width height radius foreground_col background_col Horizontal
+
+let indeterminate_vert ?(width = 5) ?(height = max_int) ?(radius = 1.0)
+    ?(background_col = default_bg) ?(foreground_col = default_fg) key =
+  view key width height radius foreground_col background_col Vertical

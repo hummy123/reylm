@@ -1,19 +1,23 @@
 open Reyml
-open Raylib
 
-type model = { color : Color.t }
+type dir = Up | Down
+type model = { dir : dir; y_pos : float }
 
-let initial_model = { color = Color.create 0 0 0 0 }
+let initial = { dir = Down; y_pos = 0.0 }
 
-let update model =
-  let rgb_val = Raylib.Color.r model.color in
-  let rgb_val = rgb_val + 1 in
-  let color = Color.create rgb_val rgb_val rgb_val rgb_val in
-  { color }
+let animate model =
+  match model.dir with
+  | Up ->
+      if model.y_pos >= -1.0 then { model with y_pos = model.y_pos -. 0.015 }
+      else { model with dir = Down }
+  | Down ->
+      if model.y_pos <= 1.0 then { model with y_pos = model.y_pos +. 0.015 }
+      else { model with dir = Up }
+
+let key = Progress_bar.key ()
 
 let view model =
-  Percent_rect.widget ~width:0.5 ~height:0.5
-    ~color:(Raylib.Color.create 0 0 0 255)
-    Empty
+  Center.widget
+    (Padding.by_axis ~horizontal:100 (Progress_bar.indeterminate_vert key))
 
-let () = run_app view initial_model
+let () = run_app view initial
