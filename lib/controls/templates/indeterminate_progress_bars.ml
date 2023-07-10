@@ -38,12 +38,12 @@ module type S = sig
     'a Drawable.drawable
 end
 
-module Make (Key : Indeterminate_progress_data) = struct
-  type key = Key.key
+module Make (Data : Indeterminate_progress_data) = struct
+  type key = Data.key
 
   (* Boilerplate initialising internal state. *)
   module State_pair = struct
-    type key = Key.key
+    type key = Data.key
     type value = progress_state
   end
 
@@ -103,15 +103,15 @@ module Make (Key : Indeterminate_progress_data) = struct
          (Rect.widget ~radius ~width ~height:foreground_height ~color:foreground
             Empty))
 
-  let horizontal ~key ?(width = Key.direction_size)
-      ?(height = Key.anti_direction_size) ?(radius = Key.radius)
-      ?(background = Key.default_background)
-      ?(foreground = Key.default_foreground) () =
+  let horizontal ~key ?(width = Data.direction_size)
+      ?(height = Data.anti_direction_size) ?(radius = Data.radius)
+      ?(background = Data.default_background)
+      ?(foreground = Data.default_foreground) () =
     view_horizontal key width height radius foreground background
 
-  let vertical ~key ?(width = Key.anti_direction_size)
-      ?(height = Key.direction_size) ?(radius = Key.radius)
-      ?(background = Key.default_background)
-      ?(foreground = Key.default_foreground) () =
+  let vertical ~key ?(width = Data.anti_direction_size)
+      ?(height = Data.direction_size) ?(radius = Data.radius)
+      ?(background = Data.default_background)
+      ?(foreground = Data.default_foreground) () =
     view_vertical key width height radius foreground background
 end

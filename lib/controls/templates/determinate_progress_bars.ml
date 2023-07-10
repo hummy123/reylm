@@ -28,7 +28,7 @@ module type S = sig
     'a Drawable.drawable
 end
 
-module Make (Key : Determinate_progress_data) = struct
+module Make (Data : Determinate_progress_data) = struct
   let view_horizontal percent width height radius foreground background =
     Rect.widget ~radius ~width ~height ~color:background
       (Percent_rect.widget ~radius ~width:percent ~height:1.0 ~color:foreground
@@ -41,12 +41,12 @@ module Make (Key : Determinate_progress_data) = struct
             ~color:foreground Empty))
 
   let horizontal ~percent ?(width = max_int) ?(height = 5)
-      ?(radius = Key.radius) ?(foreground = Key.default_foreground)
-      ?(background = Key.default_background) () =
+      ?(radius = Data.radius) ?(foreground = Data.default_foreground)
+      ?(background = Data.default_background) () =
     view_horizontal percent width height radius foreground background
 
-  let vertical ~percent ?(width = 5) ?(height = max_int) ?(radius = Key.radius)
-      ?(foreground = Key.default_foreground)
-      ?(background = Key.default_background) () =
+  let vertical ~percent ?(width = 5) ?(height = max_int) ?(radius = Data.radius)
+      ?(foreground = Data.default_foreground)
+      ?(background = Data.default_background) () =
     view_vertical percent width height radius foreground background
 end
