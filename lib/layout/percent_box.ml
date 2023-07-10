@@ -11,7 +11,7 @@ let size width height constraints =
   in
   { width; height }
 
-let draw width height radius color child constraints =
+let draw width height child constraints =
   (* Draw. *)
   let f_width = float_of_int constraints.max_width *. width |> Float.round in
   let f_height = float_of_int constraints.max_height *. height |> Float.round in
@@ -38,13 +38,9 @@ let update width height child constraints model =
   let { model; _ } = Drawable.update child_constraints model child in
   { width; height; model }
 
-let widget ?(radius = 0.0) ?(color = Color.black) ?(width = 1.0) ?(height = 1.0)
-    child =
+let widget ?(width = 1.0) ?(height = 1.0) child =
   let width = if width < 0.0 then 0.0 else if width > 1.0 then 1.0 else width in
   let height =
     if height < 0.0 then 0.0 else if height > 1.0 then 1.0 else height
   in
-  Widget
-    ( draw width height radius color child,
-      size width height,
-      update width height child )
+  Widget (draw width height child, size width height, update width height child)

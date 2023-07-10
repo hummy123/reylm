@@ -1,12 +1,12 @@
 (* Hash table for keeping track of widget state.
    Can pass around immutable data structure for same effect,
    but don't need previous versions and Hashtbl is faster. *)
-module type State_key = sig
+module type State_pair = sig
   type key
   type value
 end
 
-module Make (Key : State_key) = struct
+module Make (Key : State_pair) = struct
   type t = { mutable did_change : bool; tbl : (Key.key, Key.value) Hashtbl.t }
 
   let state = { did_change = false; tbl = Hashtbl.create 1024 }

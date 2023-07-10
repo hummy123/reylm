@@ -15,19 +15,21 @@ let size width height constraints =
   { width; height }
 
 let draw width height child constraints =
-  let ({ width; height } : drawable_size) = size width height constraints in
+  let ({ width; height } as w_size : drawable_size) =
+    size width height constraints
+  in
   let child_constraints =
-    { constraints with max_height = width; max_width = height }
+    { constraints with max_height = height; max_width = width }
   in
   let _ = draw child_constraints child in
-  size width height constraints
+  w_size
 
 let update width height child constraints model =
   let ({ width; height } : drawable_size) = size width height constraints in
   let child_constraints =
-    { constraints with max_height = width; max_width = height }
+    { constraints with max_height = height; max_width = width }
   in
-  let { model; _ } = update child_constraints model child in
+  let { model; _ } = Drawable.update child_constraints model child in
   { width; height; model }
 
 let widget ~width ~height child =

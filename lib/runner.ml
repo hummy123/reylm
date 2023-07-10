@@ -1,10 +1,9 @@
 open Raylib
 open Constraints
-open Drawable
+open Controls.Default
 
 (* Functions and data related to managing state of controls. *)
-let widget_tables =
-  ref [| Indeterminate_progress_bar.Progress_state.did_change |]
+let widget_tables = ref [| Indeterminate_progress_bar.did_change |]
 
 let register_state state_array =
   let arr = Array.append !widget_tables state_array in

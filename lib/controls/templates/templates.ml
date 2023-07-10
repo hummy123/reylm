@@ -1,0 +1,2 @@
+module Determinate_progress_bars = Determinate_progress_bars
+module Indeterminate_progress_bars = Indeterminate_progress_bars

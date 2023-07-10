@@ -1,52 +1,29 @@
 open Reyml
+open Reyml.Layout
+open Reyml.Controls.Default
+open Reyml.Controls.Templates
 
-(*
-  Example 1.
- *)
+module My_template = struct
+  type key = int
 
-(* These keys uniquely identify each Indeterminate_progress_bar so
-   we can keep track of state (handled by framework) for each. *)
-let key = Indeterminate_progress_bar.key ()
-let key2 = Indeterminate_progress_bar.key ()
-let key3 = Indeterminate_progress_bar.key ()
-let key4 = Indeterminate_progress_bar.key ()
-let key5 = Indeterminate_progress_bar.key ()
+  let default_background = Raylib.Color.create 214 214 214 255
+  let default_foreground = Raylib.Color.create 255 67 67 255
+  let radius = 1.0
+  let direction_size = max_int
+  let anti_direction_size = 10
+end
 
-let view model =
-  Padding.all 100
-    (Column.space_around
-       [|
-         Indeterminate_progress_bar.horizontal ~width:800 key;
-         Indeterminate_progress_bar.horizontal ~width:400 key2;
-         Indeterminate_progress_bar.horizontal ~width:200 key3;
-         Indeterminate_progress_bar.horizontal ~width:400 key4;
-         Indeterminate_progress_bar.horizontal ~width:800 key5;
-       |])
+module My_indeterminate = Indeterminate_progress_bars.Make (My_template)
 
-let () = run_app view ()
+let _ = register [| My_indeterminate.did_change |]
 
-(*
-  Example 2.
-  This uses a Determinate_progress_bar which takes a percentage from the model.
- *)
-
-open Reyml
-
-type model = { progress : float }
-
-let initial_model = { progress = 0.0 }
-let update model = { progress = model.progress +. 0.001 }
-
-let view model =
+let view _ =
   Padding.all 100
     (Center.widget
-       (Row.center
+       (Column.space_around
           [|
-            (* Take progress from model. *)
-            Determinate_progress_bar.horizontal ~percent:model.progress
-              ~width:800 ();
-            (* If the progress is less than 1.0, call the update function on the model. *)
-            Conditional.exec (model.progress < 1.0) update;
+            My_indeterminate.horizontal ~key:1 ();
+            Indeterminate_progress_bar.horizontal ~key:"asdf" ();
           |]))
 
-let () = run_app view initial_model
+let () = run_app view ()

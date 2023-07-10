@@ -1,0 +1,2 @@
+module Determinate_progress_bar = Determinate_progress_bar.Default
+module Indeterminate_progress_bar = Indeterminate_progress_bar.Default
