@@ -12,8 +12,8 @@ module type S = sig
     ?width:int ->
     ?height:int ->
     ?radius:float ->
-    ?background:Raylib.Color.t ->
     ?foreground:Raylib.Color.t ->
+    ?background:Raylib.Color.t ->
     unit ->
     'a Drawable.drawable
 
@@ -22,8 +22,8 @@ module type S = sig
     ?width:int ->
     ?height:int ->
     ?radius:float ->
-    ?background:Raylib.Color.t ->
     ?foreground:Raylib.Color.t ->
+    ?background:Raylib.Color.t ->
     unit ->
     'a Drawable.drawable
 end
