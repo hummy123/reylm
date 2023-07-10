@@ -3,7 +3,7 @@
 *)
 
 open Constraints
-open Flex
+open Flex_count
 open Drawable
 
 (* This type tells us which axis to draw along. *)
@@ -143,11 +143,11 @@ let calc_min_size caller flex_data constraints =
       { width; height }
 
 let min_size children caller constraints =
-  let flex_data = Flex.calc_flex_data children constraints in
+  let flex_data = Flex_count.calc_flex_data children constraints in
   calc_min_size caller flex_data constraints
 
 let min_draw children caller constraints =
-  let flex_data = Flex.calc_flex_data children constraints in
+  let flex_data = Flex_count.calc_flex_data children constraints in
   if is_in_flex_direction flex_data caller then
     flex_draw caller flex_data children constraints
   else
@@ -163,7 +163,7 @@ let min_draw children caller constraints =
     calc_min_size caller flex_data constraints
 
 let min_update children caller constraints model =
-  let flex_data = Flex.calc_flex_data children constraints in
+  let flex_data = Flex_count.calc_flex_data children constraints in
   if is_in_flex_direction flex_data caller then
     flex_update caller flex_data children constraints model
   else
@@ -183,7 +183,7 @@ let min_update children caller constraints model =
 
 (* Functions for drawing column/row where height (if column) or width (if row) takes full constraints. *)
 let max_size should_collapse children caller constraints =
-  let flex_data = Flex.calc_flex_data children constraints in
+  let flex_data = Flex_count.calc_flex_data children constraints in
   let constraints =
     collapse_constraints caller should_collapse flex_data constraints
   in
@@ -193,7 +193,7 @@ let max_size should_collapse children caller constraints =
    It checks if any children are flex and, if so, they are provided to the flex_draw instead.*)
 let flex_draw_if_flex_children should_collapse children caller constraints
     f_not_flex =
-  let flex_data = Flex.calc_flex_data children constraints in
+  let flex_data = Flex_count.calc_flex_data children constraints in
   let constraints =
     collapse_constraints caller should_collapse flex_data constraints
   in
@@ -209,7 +209,7 @@ let flex_draw_if_flex_children should_collapse children caller constraints
 
 let flex_update_if_flex_children should_collapse children caller constraints
     model f_not_flex =
-  let flex_data = Flex.calc_flex_data children constraints in
+  let flex_data = Flex_count.calc_flex_data children constraints in
   let constraints =
     collapse_constraints caller should_collapse flex_data constraints
   in

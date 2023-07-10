@@ -1,6 +1,6 @@
 open Constraints
 open Drawable
-open Flex
+open Flex_count
 
 let min children =
   Widget

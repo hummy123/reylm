@@ -51,4 +51,4 @@ module type S = sig
   (** A vertical progress bar. *)
 end
 
-module Make (Data: Indeterminate_progress_data) : S with type key = Data.key
+module Make (Data : Indeterminate_progress_data) : S with type key = Data.key

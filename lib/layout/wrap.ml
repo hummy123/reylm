@@ -107,10 +107,11 @@ let row_space_around ?(row_padding = 0) children =
       size_row SpaceAround row_padding children,
       update_row SpaceAround row_padding children )
 
-(* let row_space_between ?(row_padding = 0) children = *)
-(*   Widget *)
-(*     ( draw_row SpaceBetween row_padding children, *)
-(*       size_row SpaceBetween row_padding children ) *)
+let row_space_between ?(row_padding = 0) children =
+  Widget
+    ( draw_row SpaceBetween row_padding children,
+      size_row SpaceBetween row_padding children,
+      update_row SpaceBetween row_padding children )
 
 (* Column functions. *)
 let size_column wrap_type col_padding children constraints =
@@ -155,7 +156,8 @@ let column_space_around ?(col_padding = 0) children =
       size_column SpaceAround col_padding children,
       update_column SpaceAround col_padding children )
 
-(* let column_space_between ?(col_padding = 0) children = *)
-(*   Widget *)
-(*     ( draw_column SpaceBetween col_padding children, *)
-(*       size_column SpaceBetween col_padding children ) *)
+let column_space_between ?(col_padding = 0) children =
+  Widget
+    ( draw_column SpaceBetween col_padding children,
+      size_column SpaceBetween col_padding children,
+      update_column SpaceBetween col_padding children )
