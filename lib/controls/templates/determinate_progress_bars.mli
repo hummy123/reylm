@@ -40,4 +40,4 @@ module type S = sig
   (** A vertical progress bar. *)
 end
 
-module Make (Data : Determinate_progress_data) : S
+module Make (_ : Determinate_progress_data) : S

@@ -1,6 +1,5 @@
 open Constraints
 open Drawable
-open Raylib
 
 let size width height constraints =
   let width =
