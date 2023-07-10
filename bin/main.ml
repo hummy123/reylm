@@ -23,14 +23,12 @@ let initial_model = { red_delay = 0 }
 let update model = { red_delay = model.red_delay + 1 }
 
 let view model =
-  Padding.all 100
-    (Center.widget
-       (Column.space_around
-          [|
-            Indeterminate_progress_bar.horizontal ~key:"asdf" ();
-            (if model.red_delay > 10 then Red_bar.horizontal ~key:1 ()
-             else Empty);
-            Conditional.exec true update;
-          |]))
+  Column.space_around
+    [|
+      Indeterminate_progress_bar.horizontal ~key:"asdf" ();
+      (if model.red_delay > 10 then Red_bar.horizontal ~key:1 () else Empty);
+      Conditional.exec true update;
+      Indeterminate_progress_bar.horizontal ~key:"awer" ();
+    |]
 
 let () = run_app view initial_model

@@ -278,48 +278,6 @@ let calc_when_end caller constraints flex_data =
   | Row -> constraints.max_width - flex_data.occupied_non_flex_width
 
 (* Functions for drawing column/row with space between or space around. *)
-let row_spacer : 'a drawable = Spacer.horizontal ()
-let col_spacer : 'a drawable = Spacer.vertical ()
-
-let get_spacer : caller -> 'a drawable = function
-  | Column -> col_spacer
-  | Row -> row_spacer
-
-let draw_space_between should_collapse (children : 'a drawable array) caller
-    constraints =
-  let if_not_flex _ constraints =
-    let spacer = get_spacer caller in
-    (* We will insert a spacer in between each child. *)
-    let children =
-      Array.fold_right (fun el acc -> spacer :: el :: acc) children []
-    in
-    (* Remove first spacer from list. *)
-    let children =
-      match children with _ :: tail -> tail |> Array.of_list | _ -> [||]
-    in
-    let flex_data = Flex.calc_flex_data children constraints in
-    flex_draw caller flex_data children constraints
-  in
-  flex_draw_if_flex_children should_collapse children caller constraints
-    if_not_flex
-
-let update_space_between should_collapse children caller constraints model =
-  let if_not_flex _ constraints model =
-    let spacer = get_spacer caller in
-    (* We will insert a spacer in between each child. *)
-    let children =
-      Array.fold_right (fun el acc -> spacer :: el :: acc) children []
-    in
-    (* Remove first spacer from list. *)
-    let children =
-      match children with _ :: tail -> tail |> Array.of_list | _ -> [||]
-    in
-    let flex_data = Flex.calc_flex_data children constraints in
-    flex_update caller flex_data children constraints model
-  in
-  flex_update_if_flex_children should_collapse children caller constraints model
-    if_not_flex
-
 let get_visible_children children flex_data = function
   | Row -> Array.length children - flex_data.num_widthless_children
   | Column -> Array.length children - flex_data.num_heightless_children
@@ -332,15 +290,75 @@ let update_is_not_empty size = function
   | Row -> size.width > 0
   | Column -> size.height > 0
 
+let draw_space_between should_collapse (children : 'a drawable array) caller
+    constraints =
+  let if_not_flex flex_data constraints =
+    let remaining_space =
+      int_of_float (calc_remaining_space constraints flex_data caller)
+    in
+    let start_pos = calc_start_pos constraints caller in
+    let num_children = get_visible_children children flex_data caller in
+    let space =
+      if num_children > 0 then remaining_space / (num_children - 1)
+      else remaining_space
+    in
+    let _ =
+      Array.fold_left
+        (fun start_pos el ->
+          let constraints = set_start_pos constraints start_pos caller in
+          let size = Drawable.draw constraints el in
+          if is_not_empty size caller then
+            increment_start_pos (start_pos + space) size caller
+          else start_pos)
+        start_pos children
+    in
+    { width = constraints.max_width; height = constraints.max_height }
+  in
+  flex_draw_if_flex_children should_collapse children caller constraints
+    if_not_flex
+
+let update_space_between should_collapse (children : 'a drawable array) caller
+    constraints model =
+  let if_not_flex flex_data constraints model =
+    let remaining_space =
+      int_of_float (calc_remaining_space constraints flex_data caller)
+    in
+    let start_pos = calc_start_pos constraints caller in
+    let num_children = get_visible_children children flex_data caller in
+    let space =
+      if num_children > 0 then remaining_space / (num_children - 1)
+      else remaining_space
+    in
+    let _, model =
+      Array.fold_left
+        (fun (start_pos, model) el ->
+          let constraints = set_start_pos constraints start_pos caller in
+          let ({ model; _ } as size) = Drawable.update constraints model el in
+          let start_pos =
+            if update_is_not_empty size caller then
+              update_increment_start_pos (start_pos + space) size caller
+            else start_pos
+          in
+          (start_pos, model))
+        (start_pos, model) children
+    in
+    { width = constraints.max_width; height = constraints.max_height; model }
+  in
+  flex_update_if_flex_children should_collapse children caller constraints model
+    if_not_flex
+
 let draw_space_around should_collapse children caller constraints =
   (* if_not_flex function has to add spacing by itself,
      because the same spacer trick used in space_between doesn't work for space_around. *)
   let if_not_flex flex_data constraints =
-    let remaining_space = calc_remaining_space constraints flex_data caller in
+    let remaining_space =
+      int_of_float (calc_remaining_space constraints flex_data caller)
+    in
     let start_pos = calc_start_pos constraints caller in
+    let num_children = get_visible_children children flex_data caller in
     let space =
-      int_of_float remaining_space
-      / get_visible_children children flex_data caller
+      if num_children > 0 then remaining_space / num_children
+      else remaining_space
     in
     let _ =
       Array.fold_left
@@ -362,9 +380,15 @@ let update_space_around should_collapse children caller constraints model =
   (* if_not_flex function has to add spacing by itself,
      because the same spacer trick used in space_between doesn't work for space_around. *)
   let if_not_flex flex_data constraints model =
-    let remaining_space = calc_remaining_space constraints flex_data caller in
+    let remaining_space =
+      int_of_float (calc_remaining_space constraints flex_data caller)
+    in
     let start_pos = calc_start_pos constraints caller in
-    let space = int_of_float remaining_space / Array.length children in
+    let num_children = get_visible_children children flex_data caller in
+    let space =
+      if num_children > 0 then remaining_space / num_children
+      else remaining_space
+    in
     let _, model =
       Array.fold_left
         (fun (start_pos, model) el ->
