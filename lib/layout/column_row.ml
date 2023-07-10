@@ -320,19 +320,36 @@ let update_space_between should_collapse children caller constraints model =
   flex_update_if_flex_children should_collapse children caller constraints model
     if_not_flex
 
+let get_visible_children children flex_data = function
+  | Row -> Array.length children - flex_data.num_widthless_children
+  | Column -> Array.length children - flex_data.num_heightless_children
+
+let is_not_empty (size : drawable_size) = function
+  | Row -> size.width > 0
+  | Column -> size.height > 0
+
+let update_is_not_empty size = function
+  | Row -> size.width > 0
+  | Column -> size.height > 0
+
 let draw_space_around should_collapse children caller constraints =
   (* if_not_flex function has to add spacing by itself,
      because the same spacer trick used in space_between doesn't work for space_around. *)
   let if_not_flex flex_data constraints =
     let remaining_space = calc_remaining_space constraints flex_data caller in
     let start_pos = calc_start_pos constraints caller in
-    let space = int_of_float remaining_space / Array.length children in
+    let space =
+      int_of_float remaining_space
+      / get_visible_children children flex_data caller
+    in
     let _ =
       Array.fold_left
         (fun start_pos el ->
           let constraints = set_start_pos constraints start_pos caller in
           let size = Drawable.draw constraints el in
-          increment_start_pos (start_pos + space) size caller)
+          if is_not_empty size caller then
+            increment_start_pos (start_pos + space) size caller
+          else start_pos)
         (start_pos + (space / 2))
         children
     in
@@ -353,7 +370,9 @@ let update_space_around should_collapse children caller constraints model =
         (fun (start_pos, model) el ->
           let constraints = set_start_pos constraints start_pos caller in
           let ({ model; _ } as size) = Drawable.update constraints model el in
-          (update_increment_start_pos (start_pos + space) size caller, model))
+          if update_is_not_empty size caller then
+            (update_increment_start_pos (start_pos + space) size caller, model)
+          else (start_pos, model))
         (start_pos + (space / 2), model)
         children
     in

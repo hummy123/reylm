@@ -16,6 +16,8 @@ type flex_data = {
   num_flex_height_children : int;
   max_child_height : int;
   max_child_width : int;
+  num_widthless_children : int;
+  num_heightless_children : int;
 }
 
 let initial_flex_data =
@@ -28,6 +30,8 @@ let initial_flex_data =
     occupied_non_flex_width = 0;
     max_child_height = 0;
     max_child_width = 0;
+    num_widthless_children = 0;
+    num_heightless_children = 0;
   }
 
 let calc_flex_data children constraints =
@@ -98,5 +102,11 @@ let calc_flex_data children constraints =
             occupied_non_flex_height;
             max_child_width;
             max_child_height;
+            num_widthless_children =
+              (if width > 0 then flex_data.num_widthless_children
+               else flex_data.num_widthless_children + 1);
+            num_heightless_children =
+              (if height > 0 then flex_data.num_heightless_children
+               else flex_data.num_heightless_children + 1);
           })
     initial_flex_data children

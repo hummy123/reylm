@@ -3,7 +3,7 @@ open Reyml.Layout
 open Reyml.Controls.Default
 open Reyml.Controls.Templates
 
-module My_template = struct
+module Red_template = struct
   type key = int
 
   let default_background = Raylib.Color.create 214 214 214 255
@@ -13,17 +13,24 @@ module My_template = struct
   let anti_direction_size = 10
 end
 
-module My_indeterminate = Indeterminate_progress_bars.Make (My_template)
+module Red_bar = Indeterminate_progress_bars.Make (Red_template)
 
-let _ = register [| My_indeterminate.did_change |]
+let _ = register [| Red_bar.did_change |]
 
-let view _ =
+type model = { red_delay : int }
+
+let initial_model = { red_delay = 0 }
+let update model = { red_delay = model.red_delay + 1 }
+
+let view model =
   Padding.all 100
     (Center.widget
        (Column.space_around
           [|
-            My_indeterminate.horizontal ~key:1 ();
             Indeterminate_progress_bar.horizontal ~key:"asdf" ();
+            (if model.red_delay > 10 then Red_bar.horizontal ~key:1 ()
+             else Empty);
+            Conditional.exec true update;
           |]))
 
-let () = run_app view ()
+let () = run_app view initial_model
