@@ -9,7 +9,7 @@ end
 module Make (Key : State_pair) = struct
   type t = { mutable did_change : bool; tbl : (Key.key, Key.value) Hashtbl.t }
 
-  let state = { did_change = false; tbl = Hashtbl.create 1024 }
+  let state = { did_change = false; tbl = Hashtbl.create 128 }
 
   let did_change () =
     let did_change = state.did_change in
