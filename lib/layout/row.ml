@@ -1,6 +1,4 @@
-open Constraints
 open Drawable
-open Flex_count
 
 let min children =
   Widget
@@ -27,9 +25,6 @@ let center ?(collapse_height = true) children =
         collapse_height children Row )
 
 (* Functions for drawing row aligned to right. *)
-let calc_start_x_right constraints flex_data =
-  constraints.max_width - flex_data.occupied_non_flex_width
-
 let right ?(collapse_height = true) children =
   Widget
     ( Column_row.directional_draw
