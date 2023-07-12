@@ -9,6 +9,6 @@
 (include_subdirs unqualified)
 
 (executable
- (public_name reyml)
+ (public_name reylm)
  (name main)
- (libraries raylib reyml))
+ (libraries raylib reylm))

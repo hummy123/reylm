@@ -1,5 +1,5 @@
 (include_subdirs unqualified)
 
 (library
- (name reyml)
+ (name reylm)
  (libraries raylib eio))

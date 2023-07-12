@@ -1,7 +1,7 @@
-open Reyml
-open Reyml.Layout
-open Reyml.Controls.Default
-open Reyml.Controls.Templates
+open Reylm
+open Reylm.Layout
+open Reylm.Controls.Default
+open Reylm.Controls.Templates
 
 (* Create a new Indeterminate_progress_bar type using a functor.*)
 module Red_template = struct

@@ -1,6 +1,6 @@
 (lang dune 3.7)
 
-(name reyml)
+(name reylm)
 
 (generate_opam_files true)
 
@@ -16,7 +16,7 @@
 (documentation https://url/to/documentation)
 
 (package
- (name reyml)
+ (name reylm)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends ocaml dune raylib eio)
