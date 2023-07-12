@@ -11,7 +11,7 @@ module Red_template = struct
   let default_foreground = Raylib.Color.create 255 67 67 255
   let radius = 1.0
   let direction_size = max_int
-  let anti_direction_size = 10
+  let anti_direction_size = 5
 end
 
 module Red_bar = Indeterminate_progress_bars.Make (Red_template)
