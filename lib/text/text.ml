@@ -17,9 +17,16 @@ let get_utf8_length chr =
 let get_substring text utf8_pos length = if length = 0 then "?" else "A"
 
 let rec size_text_in_bounds text font_size utf8_pos line_start_utf8 acc_width
-    acc_height max_width_found max_height_found constraints =
+    acc_height max_width_found constraints =
   if utf8_pos = String.length text then
-    { width = max_width_found; height = max_height_found }
+    let line_str =
+      String.sub text line_start_utf8 (String.length text - line_start_utf8)
+    in
+    let text_size =
+      measure_text_ex (get_font_default ()) line_str font_size 0.0
+    in
+    let acc_height = int_of_float (Vector2.y text_size) + acc_height in
+    { width = max_width_found; height = acc_height }
   else
     let chr = String.get text utf8_pos in
     let chr_length = get_utf8_length chr in
@@ -27,8 +34,7 @@ let rec size_text_in_bounds text font_size utf8_pos line_start_utf8 acc_width
     let chr_size = measure_text substring (int_of_float font_size) in
     if chr_size + acc_width <= constraints.max_width then
       size_text_in_bounds text font_size (utf8_pos + chr_length) line_start_utf8
-        (acc_width + chr_size) acc_height max_width_found max_height_found
-        constraints
+        (acc_width + chr_size) acc_height max_width_found constraints
     else
       let line_str =
         String.sub text line_start_utf8 (utf8_pos - line_start_utf8)
@@ -40,15 +46,13 @@ let rec size_text_in_bounds text font_size utf8_pos line_start_utf8 acc_width
       let max_width_found =
         max max_width_found (int_of_float (Vector2.x text_size))
       in
-      let max_height_found = max max_height_found text_height in
       if acc_height + text_height <= constraints.max_height then
         size_text_in_bounds text font_size (utf8_pos + chr_length) utf8_pos 0
-          (acc_height + text_height) max_width_found max_height_found
-          constraints
-      else { width = max_width_found; height = max_height_found }
+          (acc_height + text_height) max_width_found constraints
+      else { width = max_width_found; height = acc_height }
 
 let size_text_wrapped text font_size constraints =
-  size_text_in_bounds text font_size 0 0 0 0 0 0 constraints
+  size_text_in_bounds text font_size 0 0 0 0 0 constraints
 
 let rec draw_text_in_bounds text font_size utf8_pos line_start_utf8 acc_width
     acc_height (color : Color.t) constraints =
