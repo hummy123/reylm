@@ -19,7 +19,7 @@
  (name reyml)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune raylib)
+ (depends ocaml dune raylib eio)
  (tags
   (topics "to describe" your project)))
 

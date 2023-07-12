@@ -2,4 +2,4 @@
 
 (library
  (name reyml)
- (libraries raylib))
+ (libraries raylib eio))

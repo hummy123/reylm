@@ -14,7 +14,8 @@ let get_utf8_length chr =
     (* Invalid UTF-8 start, but we don't want to raise exception so give a unique return value for caller to handle. *)
     0
 
-let get_substring text utf8_pos length = if length = 0 then "?" else "A"
+let get_substring text utf8_pos length =
+  if length = 0 then "?" else String.sub text utf8_pos length
 
 let rec size_text_in_bounds text font_size utf8_pos line_start_utf8 acc_width
     acc_height max_width_found constraints =

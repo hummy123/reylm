@@ -3,7 +3,7 @@ module Default_data = struct
   let default_foreground = Raylib.Color.create 0 102 180 255
   let radius = 1.0
   let direction_size = max_int
-  let anti_direction_size = 5
+  let anti_direction_size = 10
 end
 
 module Default = Determinate_progress_bars.Make (Default_data)

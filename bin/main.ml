@@ -26,16 +26,16 @@ let initial_model = { red_delay = 0 }
 let update model = { red_delay = model.red_delay + 1 }
 
 let view model =
-  Column.space_around
-    [|
-      Indeterminate_progress_bar.horizontal ~key:"asdf" ();
-      (* The if statement below displays a red progress bar with the same key but a different state,
-         because defining a new functor resets the state. *)
-      (if model.red_delay > 10 then Red_bar.horizontal ~key:"asdf" () else Empty);
-      Percent_rect.widget ~color:Raylib.Color.skyblue ~width:0.2 ~height:1.0
-        (Text.widget ~text:"hello this is kind of stupid" ~font_size:22.0 ());
-      (* Conditional.exec just calls a function to update the model whenever some condition is true. *)
-      Conditional.exec (model.red_delay <= 10) update;
-    |]
+  Padding.all 400
+    (Column.space_around
+       [|
+         Indeterminate_progress_bar.horizontal ~key:"asdf" ();
+         (* The if statement below displays a red progress bar with the same key but a different state,
+            because defining a new functor resets the state. *)
+         (if model.red_delay > 10 then Red_bar.horizontal ~key:"asdf" ()
+          else Empty);
+         (* Conditional.exec just calls a function to update the model whenever some condition is true. *)
+         Conditional.exec (model.red_delay <= 10) update;
+       |])
 
 let () = run_app view initial_model

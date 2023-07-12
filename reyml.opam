@@ -13,6 +13,7 @@ depends: [
   "ocaml"
   "dune" {>= "3.7"}
   "raylib"
+  "eio"
   "odoc" {with-doc}
 ]
 build: [
